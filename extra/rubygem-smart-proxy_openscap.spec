@@ -11,10 +11,10 @@ Group: Applications/Internet
 License: GPLv2+
 URL: http://github.com/openscap/smart-proxy_openscap
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-Requires: ruby(release)
+#Requires: ruby(release)
 Requires: ruby(rubygems)
 Requires: foreman-proxy
-BuildRequires: ruby(release)
+#BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildArch: noarch
@@ -42,6 +42,7 @@ mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
        %{buildroot}%{gem_dir}/
 mv %{buildroot}%{gem_instdir}/smart-proxy_openscap.gemspec %{buildroot}/%{gem_spec}
+rm %{buildroot}%{gem_instdir}/extra/*.spec # this specfile
 
 # bundler file
 mkdir -p %{buildroot}%{foreman_proxy_bundlerd_dir}
