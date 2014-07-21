@@ -12,5 +12,5 @@ Gem::Specification.new do |s|
   s.homepage = 'http://github.com/OpenSCAP/smart-proxy_openscap'
   s.license = 'GPL-2+'
 
-  s.files = `git ls-files`.split("\n")
+  s.files = `git ls-files`.split("\n") - ['.gitignore']
 end
