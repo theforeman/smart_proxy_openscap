@@ -9,6 +9,8 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
 #
 
+require 'smart-proxy_openscap/openscap_lib'
+
 module Proxy::OpenSCAP
   class Api < ::Sinatra::Base
     include ::Proxy::Log
@@ -18,6 +20,17 @@ module Proxy::OpenSCAP
       {"openscap" => :works}.to_json
     end
 
+    put "/arf/:policy/:date" do
+      # first let's verify client's certificate
+      begin
+        cn = Proxy::OpenSCAP::common_name request
+      rescue Proxy::Error::Unauthorized => e
+        log_halt 403, "Client authentication failed: #{e.message}"
+        return
+      end
+
+      {"openscap" => :works}.to_json
+    end
   end
 end
 
