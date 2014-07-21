@@ -26,7 +26,6 @@ module Proxy::OpenSCAP
         cn = Proxy::OpenSCAP::common_name request
       rescue Proxy::Error::Unauthorized => e
         log_halt 403, "Client authentication failed: #{e.message}"
-        return
       end
 
       {"openscap" => :works}.to_json
