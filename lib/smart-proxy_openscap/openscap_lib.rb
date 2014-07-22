@@ -9,6 +9,8 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
 #
 
+require 'proxy/error'
+
 module Proxy::OpenSCAP
   def self.common_name(request)
     client_cert = request.env['SSL_CLIENT_CERT']
@@ -23,6 +25,27 @@ module Proxy::OpenSCAP
     cn = cn[1] unless cn.nil?
     raise Proxy::Error::Unauthorized, "Common Name not found in the certificate" unless cn
     return cn
+  end
+
+  def self.spool_arf_path(policy_name, date)
+    validate_policy_name policy_name
+    validate_date date
+  end
+
+
+  private
+  def self.validate_policy_name name
+    unless /[\w-]+/ =~ name
+      raise Proxy::Error::BadRequest, "Malformed policy name"
+    end
+  end
+
+  def self.validate_date date
+    begin
+      Date.strptime(date, '%Y-%m-%d')
+    rescue
+      raise Proxy::Error::BadRequest, "Malformed date"
+    end
   end
 end
 

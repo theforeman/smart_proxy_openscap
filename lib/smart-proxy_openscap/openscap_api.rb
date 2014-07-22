@@ -28,6 +28,14 @@ module Proxy::OpenSCAP
         log_halt 403, "Client authentication failed: #{e.message}"
       end
 
+      # validate the url (i.e. avoid malformed :policy)
+      begin
+        target_path = Proxy::OpenSCAP::spool_arf_path(params[:policy], params[:date])
+      rescue Proxy::Error::BadRequest => e
+        log_halt 400, "Requested URI is malformed: #{e.message}"
+        return
+      end
+
       {"openscap" => :works}.to_json
     end
   end
