@@ -37,7 +37,15 @@ module Proxy::OpenSCAP
         log_halt 500, "Could not fulfill request: #{e.message}"
       end
 
-      {"openscap" => :works}.to_json
+      begin
+        File.open(target_path,'w') { |f| f.write(request.body.string) }
+      rescue StandardError => e
+        log_halt 500, "Could not store file: #{e.message}"
+      end
+
+      logger.debug "File #{target_path} stored successfully."
+
+      {"created" => true}.to_json
     end
   end
 end
