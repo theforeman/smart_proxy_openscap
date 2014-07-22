@@ -2,6 +2,8 @@
 
 %global foreman_proxy_bundlerd_dir /usr/share/foreman-proxy/bundler.d
 %global foreman_proxy_pluginconf_dir /etc/foreman-proxy/settings.d
+%global spool_dir /var/spool/foreman-proxy/openscap
+%global proxy_user foreman-proxy
 
 Name: rubygem-%{gem_name}
 Version: 0.0.1
@@ -54,12 +56,16 @@ mkdir -p %{buildroot}%{foreman_proxy_pluginconf_dir}
 mv %{buildroot}%{gem_instdir}/settings.d/openscap.yml.example \
    %{buildroot}%{foreman_proxy_pluginconf_dir}/
 
+# create spool directory
+mkdir -p %{buildroot}%{spool_dir}
+
 %files
 %dir %{gem_instdir}
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
 
+%attr(-,%{proxy_user},%{proxy_user}) %{spool_dir}
 %{foreman_proxy_bundlerd_dir}/openscap.rb
 %doc %{foreman_proxy_pluginconf_dir}/openscap.yml.example
 

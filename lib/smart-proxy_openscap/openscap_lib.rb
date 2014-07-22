@@ -9,6 +9,7 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
 #
 
+require 'fileutils'
 require 'proxy/error'
 
 module Proxy::OpenSCAP
@@ -27,9 +28,17 @@ module Proxy::OpenSCAP
     return cn
   end
 
-  def self.spool_arf_path(policy_name, date)
+  def self.spool_arf_path(common_name, policy_name, date)
     validate_policy_name policy_name
     validate_date date
+    dir = Proxy::OpenSCAP::Plugin.settings.spooldir + "/#{common_name}/#{policy_name}/"
+    begin
+      FileUtils.mkdir_p dir
+    rescue StandardError => e
+      logger.error "Could not create '#{dir}' directory: #{e.message}"
+      raise e
+    end
+    dir + "#{date}.rds.xml.bz2"
   end
 
 

@@ -30,10 +30,11 @@ module Proxy::OpenSCAP
 
       # validate the url (i.e. avoid malformed :policy)
       begin
-        target_path = Proxy::OpenSCAP::spool_arf_path(params[:policy], params[:date])
+        target_path = Proxy::OpenSCAP::spool_arf_path(cn, params[:policy], params[:date])
       rescue Proxy::Error::BadRequest => e
         log_halt 400, "Requested URI is malformed: #{e.message}"
-        return
+      rescue StandardError => e
+        log_halt 500, "Could not fulfill request: #{e.message}"
       end
 
       {"openscap" => :works}.to_json

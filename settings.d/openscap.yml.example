@@ -1,2 +1,6 @@
 ---
 :enabled: true
+
+# Directory where OpenSCAP audits are stored
+# before they are forwarded to Foreman
+#:spooldir: /var/spool/foreman-proxy/openscap
