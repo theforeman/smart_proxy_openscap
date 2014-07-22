@@ -16,10 +16,6 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
     helpers ::Proxy::Helpers
 
-    get "/test" do
-      {"openscap" => :works}.to_json
-    end
-
     put "/arf/:policy/:date" do
       # first let's verify client's certificate
       begin
