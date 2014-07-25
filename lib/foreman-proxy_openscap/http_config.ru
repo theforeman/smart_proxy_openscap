@@ -9,8 +9,9 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
 #
 
-require 'smart-proxy_openscap/openscap_plugin'
+require 'foreman-proxy_openscap/openscap_api'
 
-module Proxy::OpenSCAP
+map '/openscap' do
+  run Proxy::OpenSCAP::Api
 end
 

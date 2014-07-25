@@ -9,7 +9,7 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
 #
 
-require 'smart-proxy_openscap/openscap_lib'
+require 'foreman-proxy_openscap/openscap_lib'
 
 module Proxy::OpenSCAP
   class Api < ::Sinatra::Base

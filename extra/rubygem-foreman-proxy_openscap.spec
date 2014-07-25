@@ -1,4 +1,4 @@
-%global gem_name smart-proxy_openscap
+%global gem_name foreman-proxy_openscap
 
 %global foreman_proxy_bundlerd_dir /usr/share/foreman-proxy/bundler.d
 %global foreman_proxy_pluginconf_dir /etc/foreman-proxy/settings.d
@@ -11,7 +11,7 @@ Release: 1%{?dist}
 Summary: OpenSCAP plug-in for Foreman's smart-proxy.
 Group: Applications/Internet
 License: GPLv2+
-URL: http://github.com/openscap/smart-proxy_openscap
+URL: http://github.com/openscap/foreman-proxy_openscap
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 #Requires: ruby(release)
 Requires: ruby(rubygems)
@@ -43,7 +43,7 @@ gem build %{gem_name}.gemspec
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
        %{buildroot}%{gem_dir}/
-mv %{buildroot}%{gem_instdir}/smart-proxy_openscap.gemspec %{buildroot}/%{gem_spec}
+mv %{buildroot}%{gem_instdir}/foreman-proxy_openscap.gemspec %{buildroot}/%{gem_spec}
 rm %{buildroot}%{gem_instdir}/extra/*.spec # this specfile
 
 # bundler file
