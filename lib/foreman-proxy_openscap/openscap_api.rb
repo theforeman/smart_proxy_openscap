@@ -8,6 +8,7 @@
 # along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
 #
 
+require 'digest'
 require 'foreman-proxy_openscap/openscap_lib'
 
 module Proxy::OpenSCAP
@@ -25,7 +26,7 @@ module Proxy::OpenSCAP
 
       # validate the url (i.e. avoid malformed :policy)
       begin
-        target_path = Proxy::OpenSCAP::spool_arf_path(cn, params[:policy], params[:date])
+        target_dir = Proxy::OpenSCAP::spool_arf_dir(cn, params[:policy], params[:date])
       rescue Proxy::Error::BadRequest => e
         log_halt 400, "Requested URI is malformed: #{e.message}"
       rescue StandardError => e
@@ -33,6 +34,8 @@ module Proxy::OpenSCAP
       end
 
       begin
+        filename = Digest::SHA256.hexdigest request.body.string
+        target_path = target_dir + filename
         File.open(target_path,'w') { |f| f.write(request.body.string) }
       rescue StandardError => e
         log_halt 500, "Could not store file: #{e.message}"
