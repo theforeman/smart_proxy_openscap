@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.author = 'Šimon Lukašík'
   s.email = 'slukasik@redhat.com'
   s.homepage = 'http://github.com/OpenSCAP/foreman-proxy_openscap'
-  s.license = 'GPL-2+'
+  s.license = 'GPL-3'
 
   s.files = `git ls-files`.split("\n") - ['.gitignore']
 end
