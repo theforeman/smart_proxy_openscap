@@ -30,7 +30,7 @@ module Proxy::OpenSCAP
   def self.spool_arf_path(common_name, policy_name, date)
     validate_policy_name policy_name
     validate_date date
-    dir = Proxy::OpenSCAP::Plugin.settings.spooldir + "/#{common_name}/#{policy_name}/"
+    dir = Proxy::OpenSCAP::Plugin.settings.spooldir + "/arf/#{common_name}/#{policy_name}/"
     begin
       FileUtils.mkdir_p dir
     rescue StandardError => e
