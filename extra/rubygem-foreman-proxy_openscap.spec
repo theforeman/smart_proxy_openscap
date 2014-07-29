@@ -46,6 +46,11 @@ cp -a .%{gem_dir}/* \
 mv %{buildroot}%{gem_instdir}/foreman-proxy_openscap.gemspec %{buildroot}/%{gem_spec}
 rm %{buildroot}%{gem_instdir}/extra/*.spec # this specfile
 
+# executables
+mkdir -p %{buildroot}%{_bindir}
+mv  %{buildroot}%{gem_instdir}/bin/* \
+	%{buildroot}%{_bindir}
+
 # bundler file
 mkdir -p %{buildroot}%{foreman_proxy_bundlerd_dir}
 mv %{buildroot}%{gem_instdir}/bundler.d/openscap.rb \
@@ -67,6 +72,7 @@ mkdir -p %{buildroot}%{spool_dir}
 
 %attr(-,%{proxy_user},%{proxy_user}) %{spool_dir}
 %{foreman_proxy_bundlerd_dir}/openscap.rb
+%{_bindir}/foreman-proxy-openscap-send
 %doc %{foreman_proxy_pluginconf_dir}/openscap.yml.example
 
 %{gem_docdir}

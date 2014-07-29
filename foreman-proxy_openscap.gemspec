@@ -13,4 +13,5 @@ Gem::Specification.new do |s|
   s.license = 'GPL-3'
 
   s.files = `git ls-files`.split("\n") - ['.gitignore']
+  s.executables = ['foreman-proxy-openscap-send']
 end
