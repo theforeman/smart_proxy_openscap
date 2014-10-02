@@ -8,6 +8,7 @@
 # along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
 #
 
+require 'digest'
 require 'fileutils'
 require 'proxy/error'
 
@@ -40,6 +41,12 @@ module Proxy::OpenSCAP
     dir
   end
 
+  def self.store_arf(spool_arf_dir, data)
+    filename = Digest::SHA256.hexdigest data
+    target_path = spool_arf_dir + filename
+    File.open(target_path,'w') { |f| f.write(data) }
+    return target_path
+  end
 
   private
   def self.validate_policy_name name

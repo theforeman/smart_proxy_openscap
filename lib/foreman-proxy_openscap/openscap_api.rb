@@ -8,7 +8,6 @@
 # along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
 #
 
-require 'digest'
 require 'foreman-proxy_openscap/openscap_lib'
 
 module Proxy::OpenSCAP
@@ -34,9 +33,7 @@ module Proxy::OpenSCAP
       end
 
       begin
-        filename = Digest::SHA256.hexdigest request.body.string
-        target_path = target_dir + filename
-        File.open(target_path,'w') { |f| f.write(request.body.string) }
+        target_path = Proxy::OpenSCAP::store_arf(target_dir, request.body.string)
       rescue StandardError => e
         log_halt 500, "Could not store file: #{e.message}"
       end
