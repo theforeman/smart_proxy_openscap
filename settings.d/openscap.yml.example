@@ -1,6 +1,9 @@
 ---
 :enabled: true
 
+# Log file for the forwarding script.
+#:abrt_send_log_file: /var/log/foreman-proxy/openscap-send.log
+
 # Directory where OpenSCAP audits are stored
 # before they are forwarded to Foreman
 #:spooldir: /var/spool/foreman-proxy/openscap
