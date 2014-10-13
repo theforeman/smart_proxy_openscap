@@ -11,6 +11,7 @@
 require 'digest'
 require 'fileutils'
 require 'proxy/error'
+require 'proxy/request'
 
 module Proxy::OpenSCAP
   def self.common_name(request)
@@ -48,7 +49,41 @@ module Proxy::OpenSCAP
     return target_path
   end
 
+  def self.send_spool_to_foreman
+    arf_dir = File.join(Proxy::OpenSCAP::Plugin.settings.spooldir, "/arf")
+    return unless File.exists? arf_dir
+    foreman = Proxy::HttpRequest::ForemanRequest.new()
+    Dir.foreach(arf_dir) { |cname|
+      cname_dir = File.join(arf_dir, cname)
+      if File.directory? cname_dir and !(cname == '.' || cname == '..')
+        Dir.foreach(cname_dir) { |policy_name|
+          policy_dir = File.join(cname_dir, policy_name)
+          if File.directory? policy_dir and !(policy_name == '.' || policy_name == '..')
+            Dir.foreach(policy_dir) { |date|
+              date_dir = File.join(policy_dir, date)
+              if File.directory? date_dir and !(date == '.' || date == '..')
+                path = upload_path(cname, policy_name, date)
+                logger.debug("Uploading to #{path}")
+                begin
+                  response = foreman.send_request(path, true.to_json)
+                  response.value
+                rescue StandardError => e
+                  logger.debug response.body if response
+                  raise e
+                end
+              end
+            }
+          end
+        }
+      end
+    }
+  end
+
   private
+  def self.upload_path(cname, policy_name, date)
+    return "/api/v2/openscap/arf_reports/#{cname}/#{policy_name}/#{date}"
+  end
+
   def self.validate_policy_name name
     unless /[\w-]+/ =~ name
       raise Proxy::Error::BadRequest, "Malformed policy name"
