@@ -63,14 +63,19 @@ module Proxy::OpenSCAP
               date_dir = File.join(policy_dir, date)
               if File.directory? date_dir and !(date == '.' || date == '..')
                 path = upload_path(cname, policy_name, date)
-                logger.debug("Uploading to #{path}")
-                begin
-                  response = foreman.send_request(path, true.to_json)
-                  response.value
-                rescue StandardError => e
-                  logger.debug response.body if response
-                  raise e
-                end
+                Dir.foreach(date_dir) { |arf|
+                  arf_path = File.join(date_dir, arf)
+                  if File.file? arf_path and !(arf == '.' || arf == '..')
+                    logger.debug("Uploading #{arf} to #{path}")
+                    begin
+                      response = foreman.send_request(path, File.read(arf_path))
+                      response.value
+                    rescue StandardError => e
+                      logger.debug response.body if response
+                      raise e
+                    end
+                  end
+                }
               end
             }
           end
