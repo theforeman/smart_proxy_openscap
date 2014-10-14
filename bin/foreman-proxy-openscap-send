@@ -9,5 +9,33 @@
 # along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
 #
 
+$LOAD_PATH.unshift '/usr/share/foreman-proxy/lib'
+$LOAD_PATH.unshift '/usr/share/foreman-proxy/modules'
+
 require 'smart_proxy'
-require 'smart_proxy_openscap'
+require 'foreman-proxy_openscap'
+require 'foreman-proxy_openscap/openscap_lib'
+
+# Don't run if OpenSCAP plugin is disabled.
+exit unless Proxy::OpenSCAP::Plugin.settings.enabled == true
+
+module Proxy
+  module Log
+    @@logger = ::Logger.new(Proxy::OpenSCAP::Plugin.settings.openscap_send_log_file, 6, 1024*1024*10)
+    @@logger.level = ::Logger.const_get(Proxy::SETTINGS.log_level.upcase)
+  end
+end
+include Proxy::Log
+
+if !Proxy::SETTINGS.foreman_url
+  logger.error "Foreman URL not configured"
+  exit false
+end
+
+begin
+  Proxy::OpenSCAP::send_spool_to_foreman
+rescue StandardError => e
+  logger.debug e.backtrace.join("\n\t")
+  logger.error "Failed to send SCAP results to the Foreman server: #{e}"
+  exit false
+end
