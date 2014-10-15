@@ -52,7 +52,7 @@ module Proxy::OpenSCAP
   def self.send_spool_to_foreman
     arf_dir = File.join(Proxy::OpenSCAP::Plugin.settings.spooldir, "/arf")
     return unless File.exists? arf_dir
-    foreman = Proxy::HttpRequest::ForemanRequest.new()
+    foreman = ForemanForwarder.new
     Dir.foreach(arf_dir) { |cname|
       cname_dir = File.join(arf_dir, cname)
       if File.directory? cname_dir and !(cname == '.' || cname == '..')
@@ -67,7 +67,7 @@ module Proxy::OpenSCAP
                   arf_path = File.join(date_dir, arf)
                   if File.file? arf_path and !(arf == '.' || arf == '..')
                     logger.debug("Uploading #{arf} to #{path}")
-                    send_arf_file_to_foreman(foreman, path, arf_path)
+                    foreman.forward_arf_file(path, arf_path)
                   end
                 }
               end
@@ -79,16 +79,6 @@ module Proxy::OpenSCAP
   end
 
   private
-  def self.send_arf_file_to_foreman(foreman, foreman_api_path, arf_file_path)
-    begin
-      response = foreman.send_request(foreman_api_path, File.read(arf_file_path))
-      response.value
-    rescue StandardError => e
-      logger.debug response.body if response
-      raise e
-    end
-  end
-
   def self.upload_path(cname, policy_name, date)
     return "/api/v2/openscap/arf_reports/#{cname}/#{policy_name}/#{date}"
   end
@@ -104,6 +94,23 @@ module Proxy::OpenSCAP
       Date.strptime(date, '%Y-%m-%d')
     rescue
       raise Proxy::Error::BadRequest, "Malformed date"
+    end
+  end
+
+  class ForemanForwarder
+    def forward_arf_file(foreman_api_path, arf_file_path)
+      begin
+        response = foreman.send_request(foreman_api_path, File.read(arf_file_path))
+        response.value
+      rescue StandardError => e
+        logger.debug response.body if response
+        raise e
+      end
+    end
+
+    private
+    def foreman
+      @foreman ||= Proxy::HttpRequest::ForemanRequest.new
     end
   end
 end
