@@ -52,13 +52,7 @@ module Proxy::OpenSCAP
   def self.send_spool_to_foreman
     arf_dir = File.join(Proxy::OpenSCAP::Plugin.settings.spooldir, "/arf")
     return unless File.exists? arf_dir
-    foreman = ForemanForwarder.new
-    Dir.foreach(arf_dir) { |cname|
-      cname_dir = File.join(arf_dir, cname)
-      if File.directory? cname_dir and !(cname == '.' || cname == '..')
-        foreman.forward_cname_dir(cname, cname_dir)
-      end
-    }
+    ForemanForwarder.new.do arf_dir
   end
 
   private
@@ -77,6 +71,16 @@ module Proxy::OpenSCAP
   end
 
   class ForemanForwarder
+    def do(arf_dir)
+      Dir.foreach(arf_dir) { |cname|
+        cname_dir = File.join(arf_dir, cname)
+        if File.directory? cname_dir and !(cname == '.' || cname == '..')
+          forward_cname_dir(cname, cname_dir)
+        end
+      }
+    end
+
+    private
     def forward_cname_dir(cname, cname_dir)
       Dir.foreach(cname_dir) { |policy_name|
         policy_dir = File.join(cname_dir, policy_name)
@@ -86,7 +90,6 @@ module Proxy::OpenSCAP
       }
     end
 
-    private
     def forward_policy_dir(cname, policy_name, policy_dir)
       Dir.foreach(policy_dir) { |date|
         date_dir = File.join(policy_dir, date)
