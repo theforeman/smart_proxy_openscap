@@ -62,14 +62,7 @@ module Proxy::OpenSCAP
             Dir.foreach(policy_dir) { |date|
               date_dir = File.join(policy_dir, date)
               if File.directory? date_dir and !(date == '.' || date == '..')
-                path = upload_path(cname, policy_name, date)
-                Dir.foreach(date_dir) { |arf|
-                  arf_path = File.join(date_dir, arf)
-                  if File.file? arf_path and !(arf == '.' || arf == '..')
-                    logger.debug("Uploading #{arf} to #{path}")
-                    foreman.forward_arf_file(path, arf_path)
-                  end
-                }
+                foreman.forward_date_dir(cname, policy_name, date, date_dir)
               end
             }
           end
@@ -79,10 +72,6 @@ module Proxy::OpenSCAP
   end
 
   private
-  def self.upload_path(cname, policy_name, date)
-    return "/api/v2/openscap/arf_reports/#{cname}/#{policy_name}/#{date}"
-  end
-
   def self.validate_policy_name name
     unless /[\w-]+/ =~ name
       raise Proxy::Error::BadRequest, "Malformed policy name"
@@ -98,6 +87,22 @@ module Proxy::OpenSCAP
   end
 
   class ForemanForwarder
+    def forward_date_dir(cname, policy_name, date, date_dir)
+      path = upload_path(cname, policy_name, date)
+      Dir.foreach(date_dir) { |arf|
+        arf_path = File.join(date_dir, arf)
+        if File.file? arf_path and !(arf == '.' || arf == '..')
+          logger.debug("Uploading #{arf} to #{path}")
+          forward_arf_file(path, arf_path)
+        end
+      }
+    end
+
+    private
+    def upload_path(cname, policy_name, date)
+      return "/api/v2/openscap/arf_reports/#{cname}/#{policy_name}/#{date}"
+    end
+
     def forward_arf_file(foreman_api_path, arf_file_path)
       begin
         response = foreman.send_request(foreman_api_path, File.read(arf_file_path))
@@ -108,7 +113,6 @@ module Proxy::OpenSCAP
       end
     end
 
-    private
     def foreman
       @foreman ||= Proxy::HttpRequest::ForemanRequest.new
     end
