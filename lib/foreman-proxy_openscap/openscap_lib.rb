@@ -56,17 +56,7 @@ module Proxy::OpenSCAP
     Dir.foreach(arf_dir) { |cname|
       cname_dir = File.join(arf_dir, cname)
       if File.directory? cname_dir and !(cname == '.' || cname == '..')
-        Dir.foreach(cname_dir) { |policy_name|
-          policy_dir = File.join(cname_dir, policy_name)
-          if File.directory? policy_dir and !(policy_name == '.' || policy_name == '..')
-            Dir.foreach(policy_dir) { |date|
-              date_dir = File.join(policy_dir, date)
-              if File.directory? date_dir and !(date == '.' || date == '..')
-                foreman.forward_date_dir(cname, policy_name, date, date_dir)
-              end
-            }
-          end
-        }
+        foreman.forward_cname_dir(cname, cname_dir)
       end
     }
   end
@@ -87,6 +77,25 @@ module Proxy::OpenSCAP
   end
 
   class ForemanForwarder
+    def forward_cname_dir(cname, cname_dir)
+      Dir.foreach(cname_dir) { |policy_name|
+        policy_dir = File.join(cname_dir, policy_name)
+        if File.directory? policy_dir and !(policy_name == '.' || policy_name == '..')
+          forward_policy_dir(cname, policy_name, policy_dir)
+        end
+      }
+    end
+
+    private
+    def forward_policy_dir(cname, policy_name, policy_dir)
+      Dir.foreach(policy_dir) { |date|
+        date_dir = File.join(policy_dir, date)
+        if File.directory? date_dir and !(date == '.' || date == '..')
+          forward_date_dir(cname, policy_name, date, date_dir)
+        end
+      }
+    end
+
     def forward_date_dir(cname, policy_name, date, date_dir)
       path = upload_path(cname, policy_name, date)
       Dir.foreach(date_dir) { |arf|
@@ -98,7 +107,6 @@ module Proxy::OpenSCAP
       }
     end
 
-    private
     def upload_path(cname, policy_name, date)
       return "/api/v2/openscap/arf_reports/#{cname}/#{policy_name}/#{date}"
     end
