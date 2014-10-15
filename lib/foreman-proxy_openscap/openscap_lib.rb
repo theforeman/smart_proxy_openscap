@@ -67,13 +67,7 @@ module Proxy::OpenSCAP
                   arf_path = File.join(date_dir, arf)
                   if File.file? arf_path and !(arf == '.' || arf == '..')
                     logger.debug("Uploading #{arf} to #{path}")
-                    begin
-                      response = foreman.send_request(path, File.read(arf_path))
-                      response.value
-                    rescue StandardError => e
-                      logger.debug response.body if response
-                      raise e
-                    end
+                    send_arf_file_to_foreman(foreman, path, arf_path)
                   end
                 }
               end
@@ -85,6 +79,16 @@ module Proxy::OpenSCAP
   end
 
   private
+  def self.send_arf_file_to_foreman(foreman, foreman_api_path, arf_file_path)
+    begin
+      response = foreman.send_request(foreman_api_path, File.read(arf_file_path))
+      response.value
+    rescue StandardError => e
+      logger.debug response.body if response
+      raise e
+    end
+  end
+
   def self.upload_path(cname, policy_name, date)
     return "/api/v2/openscap/arf_reports/#{cname}/#{policy_name}/#{date}"
   end
