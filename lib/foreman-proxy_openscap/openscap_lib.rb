@@ -88,6 +88,7 @@ module Proxy::OpenSCAP
           forward_policy_dir(cname, policy_name, policy_dir)
         end
       }
+      remove cname_dir
     end
 
     def forward_policy_dir(cname, policy_name, policy_dir)
@@ -97,6 +98,7 @@ module Proxy::OpenSCAP
           forward_date_dir(cname, policy_name, date, date_dir)
         end
       }
+      remove policy_dir
     end
 
     def forward_date_dir(cname, policy_name, date, date_dir)
@@ -108,6 +110,7 @@ module Proxy::OpenSCAP
           forward_arf_file(path, arf_path)
         end
       }
+      remove date_dir
     end
 
     def upload_path(cname, policy_name, date)
@@ -121,6 +124,14 @@ module Proxy::OpenSCAP
       rescue StandardError => e
         logger.debug response.body if response
         raise e
+      end
+    end
+
+    def remove(dir)
+      begin
+        Dir.delete dir
+      rescue StandardError => e
+        logger.error "Could not remove directory: #{e.message}"
       end
     end
 
