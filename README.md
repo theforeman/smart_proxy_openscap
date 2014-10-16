@@ -3,8 +3,11 @@
 A plug-in to the Foreman Proxy which receives bzip2ed ARF files
 and forwards them to the Foreman.
 
-Current version only receives and stores the ARF files. The
-reports will be forwarded to foreman_openscap in future versions.
+Incoming ARF files are authenticated using puppet certificate of
+the client machine. Proxy caches collected ARF files until they
+are forwarded to Foreman.
+
+Learn more about [Foreman-OpenSCAP](https://github.com/OpenSCAP/foreman_openscap) workflow.
 
 ## Installation
 
@@ -20,7 +23,7 @@ reports will be forwarded to foreman_openscap in future versions.
   ```
   ~$ cd foreman-proxy_openscap
   ~$ gem build foreman_proxy_openscap.gemspec
-  ~# yum install yum-utils
+  ~# yum install yum-utils rpm-build
   ~# yum-builddep extra/rubygem-foreman-proxy_openscap.spec
   ~# rpmbuild  --define "_sourcedir `pwd`" -ba extra/rubygem-foreman-proxy_openscap.spec
   ```
@@ -36,6 +39,7 @@ reports will be forwarded to foreman_openscap in future versions.
   ```
   cp /etc/foreman-proxy/settings.d/openscap.yml{.example,}
   vim /etc/foreman-proxy/settings.d/openscap.yml
+  echo ":foreman_url: https://my-foreman.local.lan" >> /etc/foreman-proxy/settings.yml
   ```
 
 - Deploy
@@ -46,5 +50,21 @@ reports will be forwarded to foreman_openscap in future versions.
 
 - Usage:
 
-  Deploy openscap::xccdf::foreman_audit puppet class from Foreman on your clients.
-  The client will upload their audit results to your Foreman proxies.
+  Learn more about [Foreman-OpenSCAP](https://github.com/OpenSCAP/foreman_openscap) workflow.
+
+## Copyright
+
+Copyright (c) 2014 Red Hat, Inc.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
