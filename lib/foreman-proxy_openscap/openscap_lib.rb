@@ -127,6 +127,7 @@ module Proxy::OpenSCAP
         res = JSON.parse(response.body)
         raise StandardError, "Received result: #{res['result']}" unless res['result'] == 'OK'
         raise StandardError, "Sent bytes: #{data.length}, but foreman received: #{res['received']}" unless data.length == res['received']
+        File.delete arf_file_path
       rescue StandardError => e
         logger.debug response.body if response
         raise e
