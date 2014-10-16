@@ -19,6 +19,8 @@ require 'foreman-proxy_openscap/openscap_lib'
 # Don't run if OpenSCAP plugin is disabled.
 exit unless Proxy::OpenSCAP::Plugin.settings.enabled == true
 
+# TODO: include some jitter to not bring Foreman to its knees
+
 module Proxy
   module Log
     @@logger = ::Logger.new(Proxy::OpenSCAP::Plugin.settings.openscap_send_log_file, 6, 1024*1024*10)

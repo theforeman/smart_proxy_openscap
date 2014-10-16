@@ -16,6 +16,7 @@ Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 #Requires: ruby(release)
 Requires: ruby(rubygems)
 Requires: foreman-proxy
+Requires: crontabs
 #BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -61,6 +62,11 @@ mkdir -p %{buildroot}%{foreman_proxy_pluginconf_dir}
 mv %{buildroot}%{gem_instdir}/settings.d/openscap.yml.example \
    %{buildroot}%{foreman_proxy_pluginconf_dir}/
 
+# crontab
+mkdir -p %{buildroot}%{_sysconfdir}/cron.d/
+mv %{buildroot}%{gem_instdir}/extra/foreman-proxy-openscap-send.cron \
+   %{buildroot}%{_sysconfdir}/cron.d/%{name}
+
 # create spool directory
 mkdir -p %{buildroot}%{spool_dir}
 
@@ -74,6 +80,7 @@ mkdir -p %{buildroot}%{spool_dir}
 %{foreman_proxy_bundlerd_dir}/openscap.rb
 %{_bindir}/foreman-proxy-openscap-send
 %doc %{foreman_proxy_pluginconf_dir}/openscap.yml.example
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/cron.d/%{name}
 
 %{gem_docdir}
 %{gem_instdir}/README.md
