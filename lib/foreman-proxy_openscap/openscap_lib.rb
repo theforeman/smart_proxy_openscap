@@ -10,6 +10,7 @@
 
 require 'digest'
 require 'fileutils'
+require 'json'
 require 'proxy/error'
 require 'proxy/request'
 
@@ -119,8 +120,13 @@ module Proxy::OpenSCAP
 
     def forward_arf_file(foreman_api_path, arf_file_path)
       begin
-        response = foreman.send_request(foreman_api_path, File.read(arf_file_path))
+        data = File.read(arf_file_path)
+        response = foreman.send_request(foreman_api_path, data)
         response.value
+        raise StandardError, "Received #{response.code}: #{response.message}" unless response.code.to_i == 200
+        res = JSON.parse(response.body)
+        raise StandardError, "Received result: #{res['result']}" unless res['result'] == 'OK'
+        raise StandardError, "Sent bytes: #{data.length}, but foreman received: #{res['received']}" unless data.length == res['received']
       rescue StandardError => e
         logger.debug response.body if response
         raise e
