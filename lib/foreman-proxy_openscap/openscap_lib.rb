@@ -71,7 +71,7 @@ module Proxy::OpenSCAP
     end
   end
 
-  class ForemanForwarder
+  class ForemanForwarder < Proxy::HttpRequest::ForemanRequest
     def do(arf_dir)
       Dir.foreach(arf_dir) { |cname|
         cname_dir = File.join(arf_dir, cname)
@@ -121,7 +121,7 @@ module Proxy::OpenSCAP
     def forward_arf_file(foreman_api_path, arf_file_path)
       begin
         data = File.read(arf_file_path)
-        response = foreman.send_request(foreman_api_path, data)
+        response = send_request(foreman_api_path, data)
         response.value
         raise StandardError, "Received #{response.code}: #{response.message}" unless response.code.to_i == 200
         res = JSON.parse(response.body)
@@ -142,8 +142,20 @@ module Proxy::OpenSCAP
       end
     end
 
-    def foreman
-      @foreman ||= Proxy::HttpRequest::ForemanRequest.new
+    def send_request(path, body)
+      # Override the parent method to set the right headers
+      path = [uri.path, path].join('/') unless uri.path.empty?
+      req = Net::HTTP::Post.new(URI.join(uri.to_s, path).path)
+      # Well, this is unfortunate. We want to have content-type text/xml. We
+      # also need the content-encoding to equal with x-bzip2. However, when
+      # the Foreman's framework sees text/xml, it will rewrite it to application/xml.
+      # What's worse, a framework will try to parse body as an utf8 string,
+      # no matter what content-encoding says. Oh my.
+      # Let's pass content-type arf-bzip2 and move forward.
+      req.content_type = 'application/arf-bzip2'
+      req['Content-Encoding'] = 'x-bzip2'
+      req.body = body
+      http.request(req)
     end
   end
 end
