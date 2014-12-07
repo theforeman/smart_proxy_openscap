@@ -9,7 +9,19 @@ are forwarded to Foreman.
 
 Learn more about [Foreman-OpenSCAP](https://github.com/OpenSCAP/foreman_openscap) workflow.
 
-## Installation
+## Installation from RPMs
+
+- Install foreman-proxy from Foreman-proxy upstream
+
+- Enable [isimluk/OpenSCAP](https://copr.fedoraproject.org/coprs/isimluk/OpenSCAP/) COPR repository
+
+- Install Foreman-proxy_OpenSCAP
+
+  ```
+  # yum install rubygem-foreman-proxy_openscap
+  ```
+
+## Installation from upstream git
 
 - Install foreman-proxy from Foreman-proxy upstream
 - Download foreman-proxy_openscap
@@ -34,7 +46,7 @@ Learn more about [Foreman-OpenSCAP](https://github.com/OpenSCAP/foreman_openscap
   ~$ yum local install ~/rpmbuild/RPMS/noarch/rubygem-foreman-proxy_openscap*
   ```
 
-- Configure
+## Configuration
 
   ```
   cp /etc/foreman-proxy/settings.d/openscap.yml{.example,}
