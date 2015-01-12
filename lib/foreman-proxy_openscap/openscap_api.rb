@@ -15,7 +15,7 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
     helpers ::Proxy::Helpers
 
-    put "/arf/:policy/:date" do
+    put "/arf/:policy" do
       # first let's verify client's certificate
       begin
         cn = Proxy::OpenSCAP::common_name request
@@ -25,7 +25,7 @@ module Proxy::OpenSCAP
 
       # validate the url (i.e. avoid malformed :policy)
       begin
-        target_dir = Proxy::OpenSCAP::spool_arf_dir(cn, params[:policy], params[:date])
+        target_dir = Proxy::OpenSCAP::spool_arf_dir(cn, params[:policy])
       rescue Proxy::Error::BadRequest => e
         log_halt 400, "Requested URI is malformed: #{e.message}"
       rescue StandardError => e

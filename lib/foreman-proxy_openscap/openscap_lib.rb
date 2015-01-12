@@ -32,9 +32,9 @@ module Proxy::OpenSCAP
     return cn
   end
 
-  def self.spool_arf_dir(common_name, policy_name, date)
+  def self.spool_arf_dir(common_name, policy_name)
     validate_policy_name policy_name
-    validate_date date
+    date = Time.now.strftime("%Y-%m-%d")
     dir = Proxy::OpenSCAP::Plugin.settings.spooldir + "/arf/#{common_name}/#{policy_name}/#{date}/"
     begin
       FileUtils.mkdir_p dir
@@ -62,14 +62,6 @@ module Proxy::OpenSCAP
   def self.validate_policy_name name
     unless /[\w-]+/ =~ name
       raise Proxy::Error::BadRequest, "Malformed policy name"
-    end
-  end
-
-  def self.validate_date date
-    begin
-      Date.strptime(date, '%Y-%m-%d')
-    rescue
-      raise Proxy::Error::BadRequest, "Malformed date"
     end
   end
 
