@@ -15,6 +15,8 @@ require 'proxy/error'
 require 'proxy/request'
 
 module Proxy::OpenSCAP
+  extend ::Proxy::Log
+
   def self.common_name(request)
     client_cert = request.env['SSL_CLIENT_CERT']
     raise Proxy::Error::Unauthorized, "Client certificate required!" if client_cert.to_s.empty?
