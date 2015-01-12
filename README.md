@@ -46,6 +46,10 @@ Learn more about [Foreman-OpenSCAP](https://github.com/OpenSCAP/foreman_openscap
   ~$ yum local install ~/rpmbuild/RPMS/noarch/rubygem-foreman-proxy_openscap*
   ```
 
+If you don't install through RPM but you are using bundler, you may need to create 
+/var/spool/foreman-proxy directory manually and set it's owner to the user under which 
+foreman-proxy runs.
+
 ## Configuration
 
   ```
