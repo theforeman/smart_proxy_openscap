@@ -10,7 +10,7 @@
 
 require 'foreman-proxy_openscap/openscap_api'
 
-map '/openscap' do
+map '/compliance' do
   run Proxy::OpenSCAP::Api
 end
 
