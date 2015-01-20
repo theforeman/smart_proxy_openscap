@@ -33,7 +33,7 @@ module Proxy::OpenSCAP
   end
 
   def self.spool_arf_dir(common_name, policy_id)
-    validate_policy_id policy_id
+    validate_policy_id(policy_id)
     date = Time.now.strftime("%Y-%m-%d")
     dir = Proxy::OpenSCAP::Plugin.settings.spooldir + "/arf/#{common_name}/#{policy_id}/#{date}/"
     begin
@@ -55,11 +55,11 @@ module Proxy::OpenSCAP
   def self.send_spool_to_foreman
     arf_dir = File.join(Proxy::OpenSCAP::Plugin.settings.spooldir, "/arf")
     return unless File.exists? arf_dir
-    ForemanForwarder.new.do arf_dir
+    ForemanForwarder.new.do(arf_dir)
   end
 
   private
-  def self.validate_policy_id id
+  def self.validate_policy_id(id)
     unless /[\d]+/ =~ id
       raise Proxy::Error::BadRequest, "Malformed policy ID"
     end
@@ -83,7 +83,7 @@ module Proxy::OpenSCAP
           forward_policy_dir(cname, policy_id, policy_dir)
         end
       }
-      remove cname_dir
+      remove(cname_dir)
     end
 
     def forward_policy_dir(cname, policy_id, policy_dir)
@@ -93,7 +93,7 @@ module Proxy::OpenSCAP
           forward_date_dir(cname, policy_id, date, date_dir)
         end
       }
-      remove policy_dir
+      remove(policy_dir)
     end
 
     def forward_date_dir(cname, policy_id, date, date_dir)
@@ -105,7 +105,7 @@ module Proxy::OpenSCAP
           forward_arf_file(path, arf_path)
         end
       }
-      remove date_dir
+      remove(date_dir)
     end
 
     def upload_path(cname, policy_id, date)
