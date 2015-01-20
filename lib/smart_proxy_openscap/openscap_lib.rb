@@ -109,7 +109,7 @@ module Proxy::OpenSCAP
     end
 
     def upload_path(cname, policy_name, date)
-      return "/api/v2/openscap/arf_reports/#{cname}/#{policy_name}/#{date}"
+      return "/api/v2/compliance/arf_reports/#{cname}/#{policy_name}/#{date}"
     end
 
     def forward_arf_file(foreman_api_path, arf_file_path)
