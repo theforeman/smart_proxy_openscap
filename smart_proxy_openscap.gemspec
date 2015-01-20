@@ -1,7 +1,7 @@
-require File.expand_path('../lib/foreman-proxy_openscap/openscap_version', __FILE__)
+require File.expand_path('../lib/smart_proxy_openscap/openscap_version', __FILE__)
 
 Gem::Specification.new do |s|
-  s.name = 'foreman-proxy_openscap'
+  s.name = 'smart_proxy_openscap'
   s.version = Proxy::OpenSCAP::VERSION
   s.summary = "OpenSCAP plug-in for Foreman's smart-proxy."
   s.description = "A plug-in to the Foreman's smart-proxy which receives
@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
 
   s.author = 'Šimon Lukašík'
   s.email = 'slukasik@redhat.com'
-  s.homepage = 'http://github.com/OpenSCAP/foreman-proxy_openscap'
+  s.homepage = 'http://github.com/OpenSCAP/smart_proxy_openscap'
   s.license = 'GPL-3'
 
   s.files = `git ls-files`.split("\n") - ['.gitignore']
-  s.executables = ['foreman-proxy-openscap-send']
+  s.executables = ['smart-proxy-openscap-send']
 end

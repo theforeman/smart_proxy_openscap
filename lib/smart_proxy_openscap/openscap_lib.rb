@@ -153,4 +153,3 @@ module Proxy::OpenSCAP
     end
   end
 end
-
