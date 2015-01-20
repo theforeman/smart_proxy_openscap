@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Copyright (c) 2014 Red Hat Inc.
+# Copyright (c) 2014--2015 Red Hat Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -13,8 +13,8 @@ $LOAD_PATH.unshift '/usr/share/foreman-proxy/lib'
 $LOAD_PATH.unshift '/usr/share/foreman-proxy/modules'
 
 require 'smart_proxy'
-require 'foreman-proxy_openscap'
-require 'foreman-proxy_openscap/openscap_lib'
+require 'smart_proxy_openscap'
+require 'smart_proxy_openscap/openscap_lib'
 
 # Don't run if OpenSCAP plugin is disabled.
 exit unless Proxy::OpenSCAP::Plugin.settings.enabled == true

@@ -15,35 +15,35 @@ Learn more about [Foreman-OpenSCAP](https://github.com/OpenSCAP/foreman_openscap
 
 - Enable [isimluk/OpenSCAP](https://copr.fedoraproject.org/coprs/isimluk/OpenSCAP/) COPR repository
 
-- Install Foreman-proxy_OpenSCAP
+- Install smart_proxy_openscap
 
   ```
-  # yum install rubygem-foreman-proxy_openscap
+  # yum install rubygem-smart_proxy_openscap
   ```
 
 ## Installation from upstream git
 
 - Install foreman-proxy from Foreman-proxy upstream
-- Download foreman-proxy_openscap
+- Download smart_proxy_openscap
 
   ```
-  ~$ git clone https://github.com/OpenSCAP/foreman-proxy_openscap.git
+  ~$ git clone https://github.com/OpenSCAP/smart_proxy_openscap.git
   ```
 
-- Build foreman-proxy_openscap RPM
+- Build smart_proxy_openscap RPM
 
   ```
-  ~$ cd foreman-proxy_openscap
-  ~$ gem build foreman_proxy_openscap.gemspec
+  ~$ cd smart_proxy_openscap
+  ~$ gem build smart_proxy_openscap.gemspec
   ~# yum install yum-utils rpm-build
-  ~# yum-builddep extra/rubygem-foreman-proxy_openscap.spec
-  ~# rpmbuild  --define "_sourcedir `pwd`" -ba extra/rubygem-foreman-proxy_openscap.spec
+  ~# yum-builddep extra/rubygem-smartproxy_openscap.spec
+  ~# rpmbuild  --define "_sourcedir `pwd`" -ba extra/rubygem-smart_proxy_openscap.spec
   ```
 
-- Install rubygem-forman-proxy_openscap
+- Install rubygem-smart_proxy_openscap
 
   ```
-  ~$ yum local install ~/rpmbuild/RPMS/noarch/rubygem-foreman-proxy_openscap*
+  ~$ yum local install ~/rpmbuild/RPMS/noarch/rubygem-smart_proxy_openscap*
   ```
 
 If you don't install through RPM but you are using bundler, you may need to create 
@@ -70,7 +70,7 @@ foreman-proxy runs.
 
 ## Copyright
 
-Copyright (c) 2014 Red Hat, Inc.
+Copyright (c) 2014--2015 Red Hat, Inc.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

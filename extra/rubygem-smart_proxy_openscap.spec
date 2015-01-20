@@ -1,4 +1,4 @@
-%global gem_name foreman-proxy_openscap
+%global gem_name smart_proxy_openscap
 
 %global foreman_proxy_bundlerd_dir /usr/share/foreman-proxy/bundler.d
 %global foreman_proxy_pluginconf_dir /etc/foreman-proxy/settings.d
@@ -7,11 +7,11 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.1.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: OpenSCAP plug-in for Foreman's smart-proxy.
 Group: Applications/Internet
 License: GPLv2+
-URL: http://github.com/openscap/foreman-proxy_openscap
+URL: http://github.com/openscap/smart_proxy_openscap
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 #Requires: ruby(release)
 Requires: ruby(rubygems)
@@ -22,6 +22,7 @@ BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildArch: noarch
 Provides: rubygem(%{gem_name}) = %{version}
+Obsoletes: rubygem-foreman-proxy_openscap
 
 %description
 A plug-in to the Foreman's smart-proxy which receives bzip2ed ARF files
@@ -44,7 +45,7 @@ gem build %{gem_name}.gemspec
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
        %{buildroot}%{gem_dir}/
-mv %{buildroot}%{gem_instdir}/foreman-proxy_openscap.gemspec %{buildroot}/%{gem_spec}
+mv %{buildroot}%{gem_instdir}/%{gem_name}.gemspec %{buildroot}/%{gem_spec}
 rm %{buildroot}%{gem_instdir}/extra/*.spec # this specfile
 
 # executables
@@ -64,7 +65,7 @@ mv %{buildroot}%{gem_instdir}/settings.d/openscap.yml.example \
 
 # crontab
 mkdir -p %{buildroot}%{_sysconfdir}/cron.d/
-mv %{buildroot}%{gem_instdir}/extra/foreman-proxy-openscap-send.cron \
+mv %{buildroot}%{gem_instdir}/extra/smart-proxy-openscap-send.cron \
    %{buildroot}%{_sysconfdir}/cron.d/%{name}
 
 # create spool directory
@@ -78,7 +79,7 @@ mkdir -p %{buildroot}%{spool_dir}
 
 %attr(-,%{proxy_user},%{proxy_user}) %{spool_dir}
 %{foreman_proxy_bundlerd_dir}/openscap.rb
-%{_bindir}/foreman-proxy-openscap-send
+%{_bindir}/smart-proxy-openscap-send
 %doc %{foreman_proxy_pluginconf_dir}/openscap.yml.example
 %config(noreplace) %attr(0644, root, root) %{_sysconfdir}/cron.d/%{name}
 
@@ -87,6 +88,9 @@ mkdir -p %{buildroot}%{spool_dir}
 %{gem_instdir}/COPYING
 
 %changelog
+* Tue Jan 20 2015 Šimon Lukašík <slukasik@redhat.com> - 0.1.0-2
+- renamed to smart_proxy_openscap
+
 * Fri Oct 24 2014 Šimon Lukašík <slukasik@redhat.com> - 0.1.0-1
 - rebuilt
 

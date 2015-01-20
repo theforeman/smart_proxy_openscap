@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Red Hat Inc.
+# Copyright (c) 2014--2015 Red Hat Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -8,9 +8,8 @@
 # along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
 #
 
-require 'foreman-proxy_openscap/openscap_api'
+require 'smart_proxy_openscap/openscap_api'
 
 map '/compliance' do
   run Proxy::OpenSCAP::Api
 end
-
