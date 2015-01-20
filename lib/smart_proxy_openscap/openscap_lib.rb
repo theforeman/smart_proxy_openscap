@@ -32,10 +32,10 @@ module Proxy::OpenSCAP
     return cn
   end
 
-  def self.spool_arf_dir(common_name, policy_name)
-    validate_policy_name policy_name
+  def self.spool_arf_dir(common_name, policy_id)
+    validate_policy_id policy_id
     date = Time.now.strftime("%Y-%m-%d")
-    dir = Proxy::OpenSCAP::Plugin.settings.spooldir + "/arf/#{common_name}/#{policy_name}/#{date}/"
+    dir = Proxy::OpenSCAP::Plugin.settings.spooldir + "/arf/#{common_name}/#{policy_id}/#{date}/"
     begin
       FileUtils.mkdir_p dir
     rescue StandardError => e
@@ -59,9 +59,9 @@ module Proxy::OpenSCAP
   end
 
   private
-  def self.validate_policy_name name
-    unless /[\w-]+/ =~ name
-      raise Proxy::Error::BadRequest, "Malformed policy name"
+  def self.validate_policy_id id
+    unless /[\d]+/ =~ id
+      raise Proxy::Error::BadRequest, "Malformed policy ID"
     end
   end
 
@@ -77,27 +77,27 @@ module Proxy::OpenSCAP
 
     private
     def forward_cname_dir(cname, cname_dir)
-      Dir.foreach(cname_dir) { |policy_name|
-        policy_dir = File.join(cname_dir, policy_name)
-        if File.directory? policy_dir and !(policy_name == '.' || policy_name == '..')
-          forward_policy_dir(cname, policy_name, policy_dir)
+      Dir.foreach(cname_dir) { |policy_id|
+        policy_dir = File.join(cname_dir, policy_id)
+        if File.directory? policy_dir and !(policy_id == '.' || policy_id == '..')
+          forward_policy_dir(cname, policy_id, policy_dir)
         end
       }
       remove cname_dir
     end
 
-    def forward_policy_dir(cname, policy_name, policy_dir)
+    def forward_policy_dir(cname, policy_id, policy_dir)
       Dir.foreach(policy_dir) { |date|
         date_dir = File.join(policy_dir, date)
         if File.directory? date_dir and !(date == '.' || date == '..')
-          forward_date_dir(cname, policy_name, date, date_dir)
+          forward_date_dir(cname, policy_id, date, date_dir)
         end
       }
       remove policy_dir
     end
 
-    def forward_date_dir(cname, policy_name, date, date_dir)
-      path = upload_path(cname, policy_name, date)
+    def forward_date_dir(cname, policy_id, date, date_dir)
+      path = upload_path(cname, policy_id, date)
       Dir.foreach(date_dir) { |arf|
         arf_path = File.join(date_dir, arf)
         if File.file? arf_path and !(arf == '.' || arf == '..')
@@ -108,8 +108,8 @@ module Proxy::OpenSCAP
       remove date_dir
     end
 
-    def upload_path(cname, policy_name, date)
-      return "/api/v2/compliance/arf_reports/#{cname}/#{policy_name}/#{date}"
+    def upload_path(cname, policy_id, date)
+      return "/api/v2/compliance/arf_reports/#{cname}/#{policy_id}/#{date}"
     end
 
     def forward_arf_file(foreman_api_path, arf_file_path)
