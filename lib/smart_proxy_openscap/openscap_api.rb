@@ -14,6 +14,7 @@ module Proxy::OpenSCAP
   class Api < ::Sinatra::Base
     include ::Proxy::Log
     helpers ::Proxy::Helpers
+    authorize_with_ssl_client
 
     put "/arf/:policy" do
       # first let's verify client's certificate
