@@ -14,6 +14,7 @@ module Proxy::OpenSCAP
   class Api < ::Sinatra::Base
     include ::Proxy::Log
     helpers ::Proxy::Helpers
+    authorize_with_trusted_hosts
 
     put "/arf/:policy" do
       # first let's verify client's certificate
@@ -41,6 +42,17 @@ module Proxy::OpenSCAP
       logger.debug "File #{target_path} stored successfully."
 
       {"created" => true}.to_json
+    end
+
+    get "/policies/:policy_id/content" do
+      content_type 'application/xml'
+      begin
+        Proxy::OpenSCAP::get_policy_content(params[:policy_id])
+      rescue OpenSCAPException => e
+        log_halt e.http_code, "Error fetching xml file: #{e.message}"
+      rescue StandardError => e
+        log_halt 500, "Error occurred: #{e.message}"
+      end
     end
   end
 end
