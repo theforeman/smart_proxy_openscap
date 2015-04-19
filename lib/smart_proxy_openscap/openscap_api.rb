@@ -43,5 +43,16 @@ module Proxy::OpenSCAP
 
       {"created" => true}.to_json
     end
+
+    get "/policies/:policy_id/content" do
+      content_type 'application/xml'
+      begin
+        Proxy::OpenSCAP::get_policy_content(params[:policy_id])
+      rescue OpenSCAPException => e
+        log_halt e.http_code, "Error fetching xml file: #{e.message}"
+      rescue StandardError => e
+        log_halt 500, "Error occurred: #{e.message}"
+      end
+    end
   end
 end
