@@ -7,3 +7,7 @@
 # Directory where OpenSCAP audits are stored
 # before they are forwarded to Foreman
 #:spooldir: /var/spool/foreman-proxy/openscap
+
+# Directory where OpenSCAP content XML are stored
+# So we will not request the XML from Foreman each time
+#:contentdir: /var/lib/openscap/content
