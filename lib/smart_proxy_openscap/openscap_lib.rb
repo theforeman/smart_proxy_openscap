@@ -116,11 +116,10 @@ module Proxy::OpenSCAP
       begin
         data = File.read(arf_file_path)
         response = send_request(foreman_api_path, data)
+        # Raise an HTTP error if the response is not 2xx (success).
         response.value
-        raise StandardError, "Received #{response.code}: #{response.message}" unless response.code.to_i == 200
         res = JSON.parse(response.body)
         raise StandardError, "Received result: #{res['result']}" unless res['result'] == 'OK'
-        raise StandardError, "Sent bytes: #{data.length}, but foreman received: #{res['received']}" unless data.length == res['received']
         File.delete arf_file_path
       rescue StandardError => e
         logger.debug response.body if response
