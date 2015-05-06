@@ -21,7 +21,15 @@ module Proxy::OpenSCAP
   def self.get_policy_content(policy_id)
     policy_store_dir = File.join(Proxy::OpenSCAP::Plugin.settings.contentdir, policy_id.to_s)
     policy_scap_file = File.join(policy_store_dir, "#{policy_id}_scap_content.xml")
-    FileUtils.mkdir_p(policy_store_dir) # will fail silently if exists
+    begin
+      FileUtils.mkdir_p(policy_store_dir) # will fail silently if exists
+    rescue Errno::EACCES => e
+      logger.error "No permission to create directory #{policy_store_dir}"
+      raise e
+    rescue StandardError => e
+      logger.error "Could not create '#{policy_store_dir}' directory: #{e.message}"
+      raise e
+    end
 
     scap_file = policy_content_file(policy_scap_file)
     scap_file ||= save_or_serve_scap_file(policy_id, policy_scap_file)
