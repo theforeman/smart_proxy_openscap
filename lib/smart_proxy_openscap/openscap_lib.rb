@@ -102,7 +102,7 @@ module Proxy::OpenSCAP
   end
 
   def self.save_or_serve_scap_file(policy_id, policy_scap_file)
-    lock = Proxy::HttpDownloads.try_locking(policy_scap_file)
+    lock = Proxy::FileLock::try_locking(policy_scap_file)
     response = fetch_scap_content_xml(policy_id, policy_scap_file)
     if lock.nil?
       return response
@@ -112,7 +112,7 @@ module Proxy::OpenSCAP
           file << response
         end
       ensure
-        Proxy::HttpDownloads.unlock(lock)
+        Proxy::FileLock::unlock(lock)
       end
       scap_file = policy_content_file(policy_scap_file)
       raise FileNotFound if scap_file.nil?
