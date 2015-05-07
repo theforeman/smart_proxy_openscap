@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Red Hat Inc.
+# Copyright (c) 2014--2015 Red Hat Inc.
 #
 # This software is licensed to you under the GNU General Public License,
 # version 3 (GPLv3). There is NO WARRANTY for this software, express or
@@ -10,6 +10,6 @@
 
 module Proxy
   module OpenSCAP
-    VERSION = '0.3.0'
+    VERSION = '0.3.1'
   end
 end
