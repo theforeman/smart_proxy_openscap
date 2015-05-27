@@ -86,7 +86,7 @@ module Proxy::OpenSCAP
 
   def self.fetch_scap_content_xml(policy_id, policy_scap_file)
     foreman_request = Proxy::HttpRequest::ForemanRequest.new
-    policy_content_path = "/api/v2/compliance/policies/#{policy_id}/content"
+    policy_content_path = "api/v2/compliance/policies/#{policy_id}/content"
     req = foreman_request.request_factory.create_get(policy_content_path)
     response = foreman_request.send_request(req)
     unless response.is_a? Net::HTTPSuccess
