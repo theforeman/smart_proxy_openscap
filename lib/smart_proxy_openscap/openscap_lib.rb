@@ -10,6 +10,7 @@
 
 require 'digest'
 require 'fileutils'
+require 'pathname'
 require 'json'
 require 'proxy/error'
 require 'proxy/request'
@@ -19,9 +20,10 @@ module Proxy::OpenSCAP
   extend ::Proxy::Log
 
   def self.get_policy_content(policy_id)
-    policy_store_dir = File.join(Proxy::OpenSCAP::Plugin.settings.contentdir, policy_id.to_s)
+    policy_store_dir = File.join(fullpath(Proxy::OpenSCAP::Plugin.settings.contentdir), policy_id.to_s)
     policy_scap_file = File.join(policy_store_dir, "#{policy_id}_scap_content.xml")
     begin
+      logger.info "Creating directory to store SCAP file: #{policy_store_dir}"
       FileUtils.mkdir_p(policy_store_dir) # will fail silently if exists
     rescue Errno::EACCES => e
       logger.error "No permission to create directory #{policy_store_dir}"
@@ -118,6 +120,11 @@ module Proxy::OpenSCAP
       raise FileNotFound if scap_file.nil?
       return scap_file
     end
+  end
+
+  def self.fullpath(path = Proxy::OpenSCAP::Plugin.settings.contentdir)
+    pathname = Pathname.new(path)
+    pathname.relative? ? pathname.expand_path(Sinatra::Base.root).to_s : path
   end
 
   class ForemanForwarder < Proxy::HttpRequest::ForemanRequest
