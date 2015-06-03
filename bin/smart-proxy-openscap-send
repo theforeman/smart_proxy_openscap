@@ -23,7 +23,7 @@ exit unless Proxy::OpenSCAP::Plugin.settings.enabled == true
 
 module Proxy
   module Log
-    @@logger = ::Logger.new(Proxy::OpenSCAP::Plugin.settings.openscap_send_log_file, 6, 1024*1024*10)
+    @@logger = ::Logger.new(Proxy::OpenSCAP.fullpath(Proxy::OpenSCAP::Plugin.settings.openscap_send_log_file), 6, 1024*1024*10)
     @@logger.level = ::Logger.const_get(Proxy::SETTINGS.log_level.upcase)
   end
 end
