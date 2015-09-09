@@ -19,6 +19,7 @@ module Proxy::OpenSCAP
 
     default_settings :spooldir => '/var/spool/foreman-proxy/openscap',
                      :openscap_send_log_file => 'logs/openscap-send.log',
-                     :contentdir => 'openscap/content'
+                     :contentdir => 'openscap/content',
+                     :reportsdir => 'openscap/reports'
   end
 end

@@ -11,3 +11,6 @@
 # Directory where OpenSCAP content XML are stored
 # So we will not request the XML from Foreman each time
 #:contentdir: /var/lib/openscap/content
+# Directory where OpenSCAP report XML are stored
+# So Foreman can request arf xml reports
+#:reportsdir: /usr/share/foreman-proxy/openscap/content
