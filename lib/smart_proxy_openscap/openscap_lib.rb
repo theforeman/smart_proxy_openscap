@@ -181,11 +181,11 @@ module Proxy::OpenSCAP
         # Raise an HTTP error if the response is not 2xx (success).
         response.value
         res = JSON.parse(response.body)
-        raise StandardError, "Received result: #{res['result']}" unless res['result'] == 'OK'
+        raise StandardError, "Received response: #{response.code} #{response.msg}" unless res['result'] == 'OK'
         File.delete arf_file_path
-      rescue StandardError => e
-        logger.debug response.body if response
-        raise e
+      rescue => e
+        logger.error response.body if response
+        logger.debug e.backtrace.join("\n\t")
       end
     end
 
