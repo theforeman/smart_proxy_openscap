@@ -14,4 +14,10 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split("\n") - ['.gitignore']
   s.executables = ['smart-proxy-openscap-send']
+
+  s.add_development_dependency('rake')
+  s.add_development_dependency('rack-test')
+  s.add_development_dependency('mocha')
+  s.add_development_dependency('webmock')
+  s.add_dependency 'openscap', '>= 0.4.3'
 end

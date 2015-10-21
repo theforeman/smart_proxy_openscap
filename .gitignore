@@ -1,2 +1,4 @@
 smart_proxy_openscap-*.gem
 .idea
+Gemfile.lock
+logs
