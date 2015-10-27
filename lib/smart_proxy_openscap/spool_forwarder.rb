@@ -35,12 +35,11 @@ module Proxy::OpenSCAP
     end
 
     def forward_date_dir(cname, policy_id, date, date_dir)
-      path = upload_path(cname, policy_id, date)
       Dir.foreach(date_dir) do |arf|
         next if arf == '.' || arf == '..'
         arf_path = File.join(date_dir, arf)
         if File.file?(arf_path)
-          logger.debug("Uploading #{arf} to #{path}")
+          logger.debug("Uploading #{arf} to Foreman")
           forward_arf_file(cname, policy_id, date, arf_path)
         end
       end
@@ -49,7 +48,8 @@ module Proxy::OpenSCAP
 
     def forward_arf_file(cname, policy_id, date, arf_file_path)
       data = File.read(arf_file_path)
-      ForemanForwarder.new.post_arf_report(cname, policy_id, date, data)
+      post_to_foreman = ForemanForwarder.new.post_arf_report(cname, policy_id, date, data)
+      Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
       File.delete arf_file_path
     end
   end
