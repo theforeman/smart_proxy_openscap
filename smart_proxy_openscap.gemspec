@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.description = "A plug-in to the Foreman's smart-proxy which receives
   bzip2ed ARF files and forwards them to the Foreman."
 
-  s.author = 'Šimon Lukašík'
+  s.author = ['Šimon Lukašík', 'Shlomi Zadok', 'Marek Hulan']
   s.email = 'slukasik@redhat.com'
   s.homepage = 'http://github.com/OpenSCAP/smart_proxy_openscap'
   s.license = 'GPL-3'
