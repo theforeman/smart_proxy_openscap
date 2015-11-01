@@ -15,6 +15,7 @@ class OpenSCAPApiTest < Test::Unit::TestCase
     Proxy::OpenSCAP::Plugin.settings.stubs(:contentdir).returns(@results_path)
     Proxy::OpenSCAP::Plugin.settings.stubs(:spooldir).returns(@results_path + "/spool")
     Proxy::OpenSCAP::Plugin.settings.stubs(:reportsdir).returns(@results_path + "/reports")
+    Proxy::OpenSCAP::Plugin.settings.stubs(:failed_dir).returns(@results_path + "/failed")
     @arf_report = File.open("#{Dir.getwd}/test/data/arf_report").read
     @policy_id = 1
     @arf_id = 145
@@ -54,7 +55,7 @@ class OpenSCAPApiTest < Test::Unit::TestCase
   def test_fail_save_file_should_raise_error
     @policy_id = 2
     stub_request(:post, "#{@foreman_url}/api/v2/compliance/arf_reports/#{@cname}/#{@policy_id}/#{@date}").to_return(:status => 500, :body => "{\"result\":\"server error\"}")
-    Proxy::OpenSCAP::StoreArfSpool.any_instance.stubs(:create_directory).raises(StandardError)
+    Proxy::OpenSCAP::StorageFS.any_instance.stubs(:create_directory).raises(StandardError)
     post "/arf/#{@policy_id}", @arf_report, 'CONTENT_TYPE' => 'text/xml', 'CONTENT_ENCODING' => 'x-bzip2'
     assert(last_response.server_error?, "Should return 500")
     refute(File.file?("#{@results_path}/spool/arf/#{@cname}/#{@policy_id}/#{@date}/#{@filename}"), "File should be saved in spool directory")
@@ -63,9 +64,12 @@ class OpenSCAPApiTest < Test::Unit::TestCase
   def test_success_post_fail_save_should_save_spool
     stub_request(:post, "#{@foreman_url}/api/v2/compliance/arf_reports/#{@cname}/#{@policy_id}/#{@date}")
       .to_return(:status => 200, :body => "{\"result\":\"OK\",\"id\":\"#{@arf_id}\"}")
-    Proxy::OpenSCAP::StoreArfReports.any_instance.stubs(:create_directory).raises(StandardError)
+    Proxy::OpenSCAP::StorageFS.any_instance.stubs(:store_archive).raises(Proxy::OpenSCAP::StoreReportError)
     post "/arf/#{@policy_id}", @arf_report, 'CONTENT_TYPE' => 'text/xml', 'CONTENT_ENCODING' => 'x-bzip2'
-    assert(File.file?("#{@results_path}/spool/arf/#{@cname}/#{@policy_id}/#{@date}/#{@filename}"), "File should be saved in spool directory")
+    refute(File.file?("#{@results_path}/spool/arf/#{@cname}/#{@policy_id}/#{@date}/#{@filename}"), "File should not be  in spool directory")
     refute(File.file?("#{@results_path}/reports/arf/#{@cname}/#{@arf_id}/#{@date}/#{@filename}"), "File should not be in Reports directory")
+    assert(File.file?("#{@results_path}/failed/arf/#{@cname}/#{@arf_id}/#{@date}/#{@filename}"), "File should be in Failed directory")
+    log_file = File.read('logs/test.log')
+    assert(log_file.include?('Failed to save Report in reports directory'), 'Logger should notify that failed to save in reports dir')
   end
 end

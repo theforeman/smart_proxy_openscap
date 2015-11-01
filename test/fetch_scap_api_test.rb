@@ -57,7 +57,6 @@ class FetchScapApiTest < Test::Unit::TestCase
     get "/policies/#{@policy_id}/content"
     assert_equal(500, last_response.status, "No permissions should raise error 500")
     assert_equal('Error occurred: Permission denied', last_response.body)
-    # binding.pry
   end
 
   def test_locked_file_should_serve_from_foreman

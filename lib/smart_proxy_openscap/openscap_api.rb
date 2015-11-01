@@ -20,8 +20,6 @@ module Proxy::OpenSCAP
     Timeout::Error
   ]
 
-  FOREMAN_POST_ERRORS = HTTP_ERRORS + [Proxy::OpenSCAP::StoreReportError]
-
   class Api < ::Sinatra::Base
     include ::Proxy::Log
     helpers ::Proxy::Helpers
@@ -39,11 +37,18 @@ module Proxy::OpenSCAP
 
       begin
         post_to_foreman = ForemanForwarder.new.post_arf_report(cn, policy, date, request.body.string)
-        Proxy::OpenSCAP::StoreArfReports.new.store(cn, post_to_foreman['id'], date, request.body.string)
-      rescue *FOREMAN_POST_ERRORS => e
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, cn, post_to_foreman['id'], date)
+          .store_archive(request.body.string)
+      rescue Proxy::OpenSCAP::StoreReportError => e
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.failed_dir, cn, post_to_foreman['id'], date)
+          .store_failed(request.body.string)
+        logger.error "Failed to save Report in reports directory (#{Proxy::OpenSCAP::Plugin.settings.reportsdir}). Failed with: #{e.message}.
+                      Saving file in #{Proxy::OpenSCAP::Plugin.settings.failed_dir}. Please copy manually to #{Proxy::OpenSCAP::Plugin.settings.reportsdir}"
+      rescue *HTTP_ERRORS => e
         ### If the upload to foreman fails then store it in the spooldir
         logger.error "Failed to upload to Foreman, saving in spool. Failed with: #{e.message}"
-        Proxy::OpenSCAP::StoreArfSpool.new.store(cn, policy, date, request.body.string)
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.spooldir, cn, policy, date)
+          .store_spool(request.body.string)
       rescue Proxy::OpenSCAP::StoreSpoolError => e
         log_halt 500, e.message
       end
@@ -52,7 +57,8 @@ module Proxy::OpenSCAP
     get "/arf/:id/:cname/:date/:digest/xml" do
       content_type 'application/x-bzip2'
       begin
-        ArfReportDisplay.new(params[:cname], params[:id], params[:date], params[:digest]).to_xml
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date])
+          .get_arf_xml(params[:digest])
       rescue FileNotFound => e
         log_halt 500, "Could not find requested file, #{e.message}"
       end
@@ -60,7 +66,8 @@ module Proxy::OpenSCAP
 
     get "/arf/:id/:cname/:date/:digest/html" do
       begin
-        ArfReportDisplay.new(params[:cname], params[:id], params[:date], params[:digest]).to_html
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date])
+          .get_arf_html(params[:digest])
       rescue FileNotFound => e
         log_halt 500, "Could not find requested file, #{e.message}"
       end

@@ -14,16 +14,13 @@ require 'pathname'
 require 'json'
 require 'proxy/error'
 require 'proxy/request'
-require 'smart_proxy_openscap/arf_report_diplay'
 require 'smart_proxy_openscap/fetch_scap_content'
 require 'smart_proxy_openscap/foreman_forwarder'
 require 'smart_proxy_openscap/openscap_content_parser'
 require 'smart_proxy_openscap/openscap_exception'
 require 'smart_proxy_openscap/openscap_report_parser'
 require 'smart_proxy_openscap/spool_forwarder'
-require 'smart_proxy_openscap/store_arf_fs'
-require 'smart_proxy_openscap/store_arf_reports'
-require 'smart_proxy_openscap/store_arf_spool'
+require 'smart_proxy_openscap/storage_fs'
 
 module Proxy::OpenSCAP
   extend ::Proxy::Log
