@@ -36,6 +36,10 @@ module Proxy::OpenSCAP
       raise NotImplementedError
     end
 
+    def delete_arf_file
+      raise NotImplementedError
+    end
+
     private
 
     def validate_id(id)

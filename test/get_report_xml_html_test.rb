@@ -49,4 +49,10 @@ class OpenSCAPGetArfTest < Test::Unit::TestCase
     assert_equal(500, last_response.status, "Error response should be 500")
     assert(last_response.server_error?)
   end
+
+  def test_delete_arf_file
+    delete "/arf/#{@arf_id}/#{@cname}/#{@date}/#{@filename}"
+    assert last_response.ok?
+    refute  File.exists?("#{@results_path}/reports/arf/#{@cname}/#{@arf_id}")
+  end
 end

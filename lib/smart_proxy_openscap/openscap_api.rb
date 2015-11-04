@@ -64,6 +64,15 @@ module Proxy::OpenSCAP
       end
     end
 
+    delete "/arf/:id/:cname/:date/:digest" do
+      begin
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date])
+          .delete_arf_file
+      rescue FileNotFound => e
+        log_halt 500, "Could not find requested file, #{e.message}"
+      end
+    end
+
     get "/arf/:id/:cname/:date/:digest/html" do
       begin
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date])
