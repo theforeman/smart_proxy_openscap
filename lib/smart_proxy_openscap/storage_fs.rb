@@ -26,6 +26,13 @@ module Proxy::OpenSCAP
       arf_object.html.force_encoding('UTF-8')
     end
 
+    def delete_arf_file
+      path = "#{@path_to_dir}/#{@namespace}/#{@cname}/#{@id}"
+      raise FileNotFound, "Can't find path #{path}" if !File.directory?(path) || File.zero?(path)
+      FileUtils.rm_r path
+      {:id => @id, :deleted => true}.to_json
+    end
+
     private
 
     def store_arf(spool_arf_dir, data)
