@@ -13,6 +13,7 @@ $LOAD_PATH.unshift '/usr/share/foreman-proxy/lib'
 $LOAD_PATH.unshift '/usr/share/foreman-proxy/modules'
 
 require 'smart_proxy'
+require 'smart_proxy_main'
 require 'smart_proxy_openscap'
 require 'smart_proxy_openscap/openscap_lib'
 
