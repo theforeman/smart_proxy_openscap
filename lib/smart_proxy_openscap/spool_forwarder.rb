@@ -3,11 +3,19 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
 
     def post_arf_from_spool(arf_dir)
+      failed = nil
       Dir.foreach(arf_dir) do |cname|
-        next if cname == '.' || cname == '..'
-        cname_dir = File.join(arf_dir, cname)
-        forward_cname_dir(cname, cname_dir) if File.directory?(cname_dir)
+        begin
+          next if cname == '.' || cname == '..'
+          cname_dir = File.join(arf_dir, cname)
+          forward_cname_dir(cname, cname_dir) if File.directory?(cname_dir)
+        rescue StandardError => e
+          logger.debug e.backtrace.join("\n\t") 
+          logger.error "Failed to send SCAP results for #{cname} to the Foreman server: #{e}" 
+          failed = true
+        end
       end
+      raise "Failed to send SCAP results for one or more hosts." if failed
     end
 
     private

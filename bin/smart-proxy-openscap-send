@@ -38,7 +38,7 @@ end
 begin
   Proxy::OpenSCAP::send_spool_to_foreman
 rescue StandardError => e
-  logger.debug e.backtrace.join("\n\t")
-  logger.error "Failed to send SCAP results to the Foreman server: #{e}"
+  logger.error "#{e}
+  puts "#{e} See #{Proxy::OpenSCAP.fullpath(Proxy::OpenSCAP::Plugin.settings.openscap_send_log_file)}"
   exit false
 end
