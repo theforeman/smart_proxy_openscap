@@ -46,7 +46,7 @@ module Proxy::OpenSCAP
       begin
         FileUtils.mkdir_p @path
       rescue StandardError => e
-        logger.error "Could not create '#{dir}' directory: #{e.message}"
+        logger.error "Could not create '#{@path}' directory: #{e.message}"
         raise e
       end
       @path
