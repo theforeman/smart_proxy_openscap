@@ -69,7 +69,7 @@ module Proxy::OpenSCAP
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date])
           .delete_arf_file
       rescue FileNotFound => e
-        log_halt 500, "Could not find requested file, #{e.message}"
+        logger.debug "Could not find requested file, #{e.message} - Assuming deleted"
       end
     end
 
