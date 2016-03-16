@@ -9,7 +9,12 @@
 #
 
 require 'smart_proxy_openscap/openscap_api'
+require 'smart_proxy_openscap/openscap_import_api'
 
 map '/compliance' do
   run Proxy::OpenSCAP::Api
+end
+
+map '/compliance-importer' do
+  run Proxy::OpenSCAP::ImportApi
 end
