@@ -2,3 +2,4 @@ smart_proxy_openscap-*.gem
 .idea
 Gemfile.lock
 logs
+Gemfile.local.rb
