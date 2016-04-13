@@ -18,9 +18,9 @@ module Proxy::OpenSCAP
     https_rackup_path File.expand_path("http_config.ru", File.expand_path("../", __FILE__))
 
     default_settings :spooldir => '/var/spool/foreman-proxy/openscap',
-                     :openscap_send_log_file => 'logs/openscap-send.log',
-                     :contentdir => 'openscap/content',
-                     :reportsdir => 'openscap/reports',
-                     :failed_dir => 'openscap/failed'
+                     :openscap_send_log_file => File.join(APP_ROOT, 'logs/openscap-send.log'),
+                     :contentdir => File.join(APP_ROOT, 'openscap/content'),
+                     :reportsdir => File.join(APP_ROOT, 'openscap/reports'),
+                     :failed_dir => File.join(APP_ROOT, 'openscap/failed')
   end
 end
