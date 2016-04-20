@@ -8,7 +8,7 @@
 # along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
 #
 
-require 'smart_proxy_openscap/openscap_version'
+require 'smart_proxy_openscap/version'
 
 module Proxy::OpenSCAP
   class Plugin < ::Proxy::Plugin
