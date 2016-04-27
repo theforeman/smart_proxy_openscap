@@ -7,6 +7,8 @@ require 'openscap/xccdf/rule'
 require 'openscap/xccdf/fix'
 require 'openscap/xccdf/benchmark'
 require 'json'
+require 'iconv' if RUBY_VERSION.start_with? '1.8'
+
 module Proxy::OpenSCAP
   class Parse
     def initialize(arf_data)
@@ -81,7 +83,13 @@ module Proxy::OpenSCAP
     #   Sets the replacement string to the given value. The default replacement
     #   string is "\uFFFD" for Unicode encoding forms, and "?" otherwise.
     def ascii8bit_to_utf8(string)
+      return ascii8bit_to_utf8_legacy(string) if RUBY_VERSION.start_with? '1.8'
       string.to_s.encode('utf-8', :invalid => :replace, :undef => :replace, :replace => '_')
+    end
+
+    # String#encode appeared first in 1.9, so we need a workaround for 1.8
+    def ascii8bit_to_utf8_legacy(string)
+      Iconv.conv('UTF-8//IGNORE', 'UTF-8', string)
     end
 
     def hash_a8b(ary)
