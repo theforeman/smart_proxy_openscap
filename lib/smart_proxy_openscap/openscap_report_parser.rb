@@ -89,7 +89,7 @@ module Proxy::OpenSCAP
 
     # String#encode appeared first in 1.9, so we need a workaround for 1.8
     def ascii8bit_to_utf8_legacy(string)
-      Iconv.conv('UTF-8//IGNORE', 'UTF-8', string)
+      Iconv.conv('UTF-8//IGNORE', 'UTF-8', string.to_s)
     end
 
     def hash_a8b(ary)
