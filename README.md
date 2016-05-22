@@ -26,7 +26,7 @@ Learn more about [Foreman-OpenSCAP](https://github.com/theforeman/foreman_opensc
 - Add smart_proxy_openscap to your smart proxy `bundler.d/openscap.rb` gemfile:
  
   ```
-  ~$ gem 'smart_proxy_openscap', :git => https://github.com/theforeman/smart_proxy_openscap.git
+  ~$ gem 'smart_proxy_openscap', :git => 'https://github.com/theforeman/smart_proxy_openscap.git'
   ```
 
 If you don't install through RPM and you are using bundler, you may need to create 
