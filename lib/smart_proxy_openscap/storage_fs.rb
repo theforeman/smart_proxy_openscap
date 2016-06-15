@@ -23,6 +23,8 @@ module Proxy::OpenSCAP
       xml = get_arf_file(digest)[:xml]
       size = get_arf_file(digest)[:size]
       arf_object = OpenSCAP::DS::Arf.new(:content => xml, :path => 'arf.xml.bz2', :length => size)
+      # @TODO: Drop this when support for 1.8.7 ends
+      return arf_object.html if RUBY_VERSION.start_with? '1.8'
       arf_object.html.force_encoding('UTF-8')
     end
 
@@ -72,7 +74,7 @@ module Proxy::OpenSCAP
       full_path = @path + digest
       raise FileNotFound, "Can't find path #{full_path}" if !File.file?(full_path) || File.zero?(full_path)
       file = File.open(full_path)
-      { :size => file.size, :xml => file.read }
+      { :size => File.size(file), :xml => file.read }
     end
   end
 end
