@@ -1,6 +1,8 @@
 require 'rake'
 require 'rake/testtask'
 
+Bundler::GemHelper.install_tasks
+
 desc 'Default: run unit tests.'
 task :default => :test
 
