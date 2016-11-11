@@ -21,6 +21,7 @@ module Proxy::OpenSCAP
                      :openscap_send_log_file => File.join(APP_ROOT, 'logs/openscap-send.log'),
                      :contentdir => File.join(APP_ROOT, 'openscap/content'),
                      :reportsdir => File.join(APP_ROOT, 'openscap/reports'),
-                     :failed_dir => File.join(APP_ROOT, 'openscap/failed')
+                     :failed_dir => File.join(APP_ROOT, 'openscap/failed'),
+                     :tailoring_dir => File.join(APP_ROOT, 'openscap/tailoring')
   end
 end

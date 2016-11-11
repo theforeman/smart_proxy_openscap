@@ -21,6 +21,7 @@ require 'smart_proxy_openscap/openscap_exception'
 require 'smart_proxy_openscap/openscap_report_parser'
 require 'smart_proxy_openscap/spool_forwarder'
 require 'smart_proxy_openscap/storage_fs'
+require 'smart_proxy_openscap/fetch_tailoring_file'
 
 module Proxy::OpenSCAP
   extend ::Proxy::Log

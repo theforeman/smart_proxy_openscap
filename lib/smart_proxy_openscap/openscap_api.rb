@@ -87,6 +87,17 @@ module Proxy::OpenSCAP
       end
     end
 
+    get "/policies/:policy_id/tailoring" do
+      content_type 'application/xml'
+      begin
+        Proxy::OpenSCAP::FetchTailoringFile.new.get_tailoring_file(params[:policy_id])
+      rescue *HTTP_ERRORS => e
+        log_halt e.response.code.to_i, "File not found on Foreman. Wrong policy id?"
+      rescue StandardError => e
+        log_halt 500, "Error occurred: #{e.message}"
+      end
+    end
+
     post "/scap_content/policies" do
       begin
         Proxy::OpenSCAP::ContentParser.new(request.body.string).extract_policies
@@ -97,9 +108,9 @@ module Proxy::OpenSCAP
       end
     end
 
-    post "/scap_content/validator" do
+    post "/tailoring_file/profiles" do
       begin
-        Proxy::OpenSCAP::ContentParser.new(request.body.string).validate
+        Proxy::OpenSCAP::ContentParser.new(request.body.string).get_profiles
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
@@ -107,9 +118,31 @@ module Proxy::OpenSCAP
       end
     end
 
+    post "/scap_file/validator/:type" do
+      validate_scap_file params
+    end
+
+    post "/scap_content/validator" do
+      logger.warn "DEPRECATION WARNING: '/scap_content/validator' will be removed in the future. Use '/scap_file/validator/scap_content' instead"
+      params[:type] = 'scap_content'
+      validate_scap_file params
+    end
+
     post "/scap_content/guide/:policy" do
       begin
         Proxy::OpenSCAP::ContentParser.new(request.body.string).guide(params[:policy])
+      rescue *HTTP_ERRORS => e
+        log_halt 500, e.message
+      rescue StandardError => e
+        log_halt 500, "Error occurred: #{e.message}"
+      end
+    end
+
+    private
+
+    def validate_scap_file(params)
+      begin
+        Proxy::OpenSCAP::ContentParser.new(request.body.string, params[:type]).validate
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
