@@ -99,10 +99,10 @@ module Proxy::OpenSCAP
       end
     end
 
-    get "/policies/:policy_id/tailoring" do
+    get "/policies/:policy_id/tailoring/:digest" do
       content_type 'application/xml'
       begin
-        Proxy::OpenSCAP::FetchTailoringFile.new.get_tailoring_file(params[:policy_id])
+        Proxy::OpenSCAP::FetchTailoringFile.new.get_tailoring_file(params[:policy_id], params[:digest])
       rescue *HTTP_ERRORS => e
         log_halt e.response.code.to_i, "File not found on Foreman. Wrong policy id?"
       rescue StandardError => e

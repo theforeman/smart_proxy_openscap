@@ -2,7 +2,6 @@ require 'smart_proxy_openscap/fetch_file'
 
 module Proxy::OpenSCAP
   class FetchScapContent < FetchFile
-
     def get_policy_content(policy_id, digest)
       policy_store_dir = File.join(Proxy::OpenSCAP.fullpath(Proxy::OpenSCAP::Plugin.settings.contentdir), policy_id.to_s)
       policy_scap_file = File.join(policy_store_dir, "#{policy_id}_#{digest}.xml")

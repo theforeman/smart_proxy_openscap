@@ -17,8 +17,8 @@ class FetchScapApiTest < Test::Unit::TestCase
     Proxy::OpenSCAP::Plugin.settings.stubs(:spooldir).returns(@results_path)
     Proxy::OpenSCAP::Plugin.settings.stubs(:reportsdir).returns(@results_path)
     @scap_content = File.new("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml").read
-    @policy_id = 1
     @digest = Digest::SHA256.hexdigest @scap_content
+    @policy_id = 1
   end
 
   def teardown
