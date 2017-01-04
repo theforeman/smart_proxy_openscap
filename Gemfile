@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
+  gem 'test-unit'
   gem 'pry'
   gem 'rubocop'
   gem 'smart_proxy', :github => "theforeman/smart-proxy", :branch => 'develop'
