@@ -20,9 +20,9 @@ module Proxy::OpenSCAP
       File.open(policy_scap_file, 'rb').read
     end
 
-    def save_or_serve_scap_file(policy_id, policy_scap_file, file_download_path)
+    def save_or_serve_scap_file(policy_scap_file, file_download_path)
       lock = Proxy::FileLock::try_locking(policy_scap_file)
-      response = fetch_scap_content_xml(policy_id, policy_scap_file, file_download_path)
+      response = fetch_scap_content_xml(file_download_path)
       if lock.nil?
         return response
       else
@@ -39,12 +39,16 @@ module Proxy::OpenSCAP
       end
     end
 
-    def fetch_scap_content_xml(policy_id, policy_scap_file, file_download_path)
+    def fetch_scap_content_xml(file_download_path)
       foreman_request = Proxy::HttpRequest::ForemanRequest.new
       req = foreman_request.request_factory.create_get(file_download_path)
       response = foreman_request.send_request(req)
       response.value
       response.body
+    end
+
+    def clean_store_folder(policy_store_dir)
+      FileUtils.rm_f Dir["#{policy_store_dir}/*.xml"]
     end
   end
 end
