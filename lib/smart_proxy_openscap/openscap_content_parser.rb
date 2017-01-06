@@ -1,12 +1,21 @@
 require 'openscap/ds/sds'
 require 'openscap/source'
 require 'openscap/xccdf/benchmark'
+require 'openscap/xccdf/tailoring'
 
 module Proxy::OpenSCAP
   class ContentParser
-    def initialize(scap_content)
+    def initialize(scap_file, type = 'scap_content')
       OpenSCAP.oscap_init
-      @source = OpenSCAP::Source.new(:content => scap_content)
+      @source = OpenSCAP::Source.new(:content => scap_file)
+      @type = type
+    end
+
+    def allowed_types
+      {
+        'tailoring_file' => 'XCCDF Tailoring',
+        'scap_content' => 'SCAP Source Datastream'
+      }
     end
 
     def extract_policies
@@ -19,11 +28,20 @@ module Proxy::OpenSCAP
       policies.to_json
     end
 
+    def get_profiles
+      tailoring = ::OpenSCAP::Xccdf::Tailoring.new(@source, nil)
+      profiles = tailoring.profiles.inject({}) do |memo, (key, profile)|
+        memo.tap { |hash| hash[key] = profile.title }
+      end
+      tailoring.destroy
+      profiles.to_json
+    end
+
     def validate
       errors = []
-      allowed_type = 'SCAP Source Datastream'
-      if @source.type != allowed_type
-        errors << "Uploaded file is not #{allowed_type}"
+
+      if @source.type != allowed_types[@type]
+        errors << "Uploaded file is #{@source.type}, unexpected file type"
       end
 
       begin

@@ -12,6 +12,9 @@
 # So we will not request the XML from Foreman each time
 #:contentdir: /var/lib/openscap/content
 
+# Directory where OpenSCAP tailoring XML files are stored
+#:tailoring_dir: /var/lib/openscap/tailoring
+
 # Directory where OpenSCAP report XML are stored
 # So Foreman can request arf xml reports
 #:reportsdir: /usr/share/foreman-proxy/openscap/reports

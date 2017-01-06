@@ -9,6 +9,7 @@ class ScapContentParserApiTest < Test::Unit::TestCase
     @foreman_url = 'https://foreman.example.com'
     Proxy::SETTINGS.stubs(:foreman_url).returns(@foreman_url)
     @scap_content = File.new("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml").read
+    @tailoring_file = File.new("#{Dir.getwd}/test/data/tailoring.xml").read
   end
 
   def app
@@ -31,7 +32,7 @@ class ScapContentParserApiTest < Test::Unit::TestCase
   end
 
   def test_scap_content_validator
-    post '/scap_content/validator', @scap_content, 'CONTENT_TYPE' => 'text/xml'
+    post '/scap_file/validator/scap_content', @scap_content, 'CONTENT_TYPE' => 'text/xml'
     result = JSON.parse(last_response.body)
     assert_empty(result['errors'])
     assert(last_response.successful?)
@@ -39,7 +40,7 @@ class ScapContentParserApiTest < Test::Unit::TestCase
 
   def test_invalid_scap_content_validator
     Proxy::OpenSCAP::ContentParser.any_instance.stubs(:validate).returns({:errors => 'Invalid SCAP file type'}.to_json)
-    post '/scap_content/validator', @scap_content, 'CONTENT_TYPE' => 'text/xml'
+    post '/scap_file/validator/scap_content', @scap_content, 'CONTENT_TYPE' => 'text/xml'
     result = JSON.parse(last_response.body)
     refute_empty(result['errors'])
     assert(last_response.successful?)
@@ -49,6 +50,20 @@ class ScapContentParserApiTest < Test::Unit::TestCase
     post '/scap_content/guide/xccdf_org.ssgproject.content_profile_rht-ccp', @scap_content, 'CONTENT_TYPE' => 'text/xml'
     result = JSON.parse(last_response.body)
     assert(result['html'].start_with?('<!DOCTYPE html>'))
+    assert(last_response.successful?)
+  end
+
+  def test_validate_tailoring_file
+    post '/scap_file/validator/tailoring_file', @tailoring_file, 'CONTENT_TYPE' => 'text/xml'
+    result = JSON.parse(last_response.body)
+    assert_empty(result['errors'])
+    assert(last_response.successful?)
+  end
+
+  def test_get_profiles_from_tailoring_file
+    post '/tailoring_file/profiles', @tailoring_file, 'CONTENT_TYPE' => 'text/xml'
+    result = JSON.parse(last_response.body)
+    assert_equal 1, result.keys.length
     assert(last_response.successful?)
   end
 end
