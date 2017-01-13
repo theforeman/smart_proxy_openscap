@@ -76,10 +76,22 @@ module Proxy::OpenSCAP
       end
     end
 
-    get "/policies/:policy_id/content" do
+    get "/policies/:policy_id/content/:digest" do
       content_type 'application/xml'
       begin
-        Proxy::OpenSCAP::FetchScapContent.new.get_policy_content(params[:policy_id])
+        Proxy::OpenSCAP::FetchScapContent.new.get_policy_content(params[:policy_id], params[:digest])
+      rescue *HTTP_ERRORS => e
+        log_halt e.response.code.to_i, "File not found on Foreman. Wrong policy id?"
+      rescue StandardError => e
+        log_halt 500, "Error occurred: #{e.message}"
+      end
+    end
+
+    get "/policies/:policy_id/content" do
+      content_type 'application/xml'
+      logger.warn 'DEPRECATION WARNING: /policies/:policy_id/content/:digest should be used, please update foreman_openscap'
+      begin
+        Proxy::OpenSCAP::FetchScapContent.new.get_policy_content(params[:policy_id], 'scap_content')
       rescue *HTTP_ERRORS => e
         log_halt e.response.code.to_i, "File not found on Foreman. Wrong policy id?"
       rescue StandardError => e

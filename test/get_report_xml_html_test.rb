@@ -53,6 +53,6 @@ class OpenSCAPGetArfTest < Test::Unit::TestCase
   def test_delete_arf_file
     delete "/arf/#{@arf_id}/#{@cname}/#{@date}/#{@filename}"
     assert last_response.ok?
-    refute  File.exists?("#{@results_path}/reports/arf/#{@cname}/#{@arf_id}")
+    refute  File.exist?("#{@results_path}/reports/arf/#{@cname}/#{@arf_id}")
   end
 end
