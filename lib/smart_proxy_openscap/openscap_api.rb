@@ -42,6 +42,9 @@ module Proxy::OpenSCAP
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.failed_dir, cn, post_to_foreman['id'], date).store_failed(request.body.string)
         logger.error "Failed to save Report in reports directory (#{Proxy::OpenSCAP::Plugin.settings.reportsdir}). Failed with: #{e.message}.
                       Saving file in #{Proxy::OpenSCAP::Plugin.settings.failed_dir}. Please copy manually to #{Proxy::OpenSCAP::Plugin.settings.reportsdir}"
+      rescue OpenSCAP::OpenSCAPError => e
+        logger.error "Failed to parse Arf Report, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cn, policy, date).store_corrupted(request.body.string)
       rescue *HTTP_ERRORS => e
         ### If the upload to foreman fails then store it in the spooldir
         logger.error "Failed to upload to Foreman, saving in spool. Failed with: #{e.message}"

@@ -3,19 +3,11 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
 
     def post_arf_from_spool(arf_dir)
-      failed = nil
       Dir.foreach(arf_dir) do |cname|
-        begin
-          next if cname == '.' || cname == '..'
-          cname_dir = File.join(arf_dir, cname)
-          forward_cname_dir(cname, cname_dir) if File.directory?(cname_dir)
-        rescue StandardError => e
-          logger.debug e.backtrace.join("\n\t") 
-          logger.error "Failed to send SCAP results for #{cname} to the Foreman server: #{e}" 
-          failed = true
-        end
+        next if cname == '.' || cname == '..'
+        cname_dir = File.join(arf_dir, cname)
+        forward_cname_dir(cname, cname_dir) if File.directory?(cname_dir)
       end
-      raise "Failed to send SCAP results for one or more hosts." if failed
     end
 
     private
@@ -28,7 +20,7 @@ module Proxy::OpenSCAP
           forward_policy_dir(cname, policy_id, policy_dir)
         end
       end
-      remove(cname_dir)
+      remove_if_empty(cname_dir)
     end
 
     def forward_policy_dir(cname, policy_id, policy_dir)
@@ -39,7 +31,7 @@ module Proxy::OpenSCAP
           forward_date_dir(cname, policy_id, date, date_dir)
         end
       end
-      remove(policy_dir)
+      remove_if_empty(policy_dir)
     end
 
     def forward_date_dir(cname, policy_id, date, date_dir)
@@ -51,7 +43,7 @@ module Proxy::OpenSCAP
           forward_arf_file(cname, policy_id, date, arf_path)
         end
       end
-      remove(date_dir)
+      remove_if_empty(date_dir)
     end
 
     def forward_arf_file(cname, policy_id, date, arf_file_path)
@@ -59,11 +51,19 @@ module Proxy::OpenSCAP
       post_to_foreman = ForemanForwarder.new.post_arf_report(cname, policy_id, date, data)
       Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
       File.delete arf_file_path
+    rescue OpenSCAP::OpenSCAPError => e
+      logger.error "Failed to parse Arf Report at #{arf_file_path}, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
+
+      Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cname, policy_id, date)
+                                .move_corrupted(arf_file_path.split('/').last)
+    rescue StandardError => e
+      logger.error "smart-proxy-openscap-send failed to upload Compliance report for #{cname}, generated on #{Time.at date.to_i}. Cause: #{e}"
     end
 
-    def remove(dir)
+    def remove_if_empty(dir)
       begin
-        Dir.delete dir
+        Dir.delete dir if Dir["#{dir}/*"].empty?
+        logger.debug "Removing directory: #{dir}"
       rescue StandardError => e
         logger.error "Could not remove directory: #{e.message}"
       end
