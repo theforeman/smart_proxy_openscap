@@ -20,6 +20,10 @@ module Proxy::OpenSCAP
       File.open(policy_scap_file, 'rb').read
     end
 
+    def clean_store_folder(policy_store_dir)
+      FileUtils.rm_f Dir["#{policy_store_dir}/*.xml"]
+    end
+
     def save_or_serve_scap_file(policy_scap_file, file_download_path)
       lock = Proxy::FileLock::try_locking(policy_scap_file)
       response = fetch_scap_content_xml(file_download_path)
