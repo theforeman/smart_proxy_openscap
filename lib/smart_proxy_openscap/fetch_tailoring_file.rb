@@ -10,7 +10,7 @@ module Proxy::OpenSCAP
       create_store_dir store_dir
 
       scap_file = policy_content_file(policy_tailoring_file)
-      clean_store_folder(policy_store_dir) unless scap_file
+      clean_store_folder(store_dir) unless scap_file
       scap_file ||= save_or_serve_scap_file(policy_tailoring_file, file_download_path)
     end
   end
