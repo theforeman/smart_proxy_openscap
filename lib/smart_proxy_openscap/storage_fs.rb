@@ -14,6 +14,15 @@ module Proxy::OpenSCAP
       store(data, StoreFailedError)
     end
 
+    def store_corrupted(data)
+      store(data, StoreCorruptedError)
+    end
+
+    def move_corrupted(digest)
+      source = "#{Proxy::OpenSCAP::Plugin.settings.spooldir}/#{@namespace}/#{@cname}/#{@id}/#{@date}"
+      move "#{source}/#{digest}", StoreCorruptedError
+    end
+
     def get_arf_xml(digest)
       get_arf_file(digest)[:xml]
     end
@@ -52,6 +61,15 @@ module Proxy::OpenSCAP
         raise e
       end
       @path
+    end
+
+    def move(source, error_type)
+      begin
+        create_directory
+        FileUtils.mv source, @path
+      rescue StandardError => e
+        raise error_type, "Could not move file: #{e.message}"
+      end
     end
 
     def store(data, error_type)

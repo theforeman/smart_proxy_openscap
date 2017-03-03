@@ -4,4 +4,5 @@ module Proxy::OpenSCAP
   class StoreSpoolError < StandardError; end
   class StoreFailedError < StandardError; end
   class FileNotFound < StandardError; end
+  class StoreCorruptedError < StandardError; end
 end

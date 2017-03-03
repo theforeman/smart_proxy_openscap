@@ -11,6 +11,9 @@ module Proxy::OpenSCAP
         response.value
         res = JSON.parse(response.body)
         raise StandardError, "Received response: #{response.code} #{response.msg}" unless res['result'] == 'OK'
+      rescue OpenSCAP::OpenSCAPError => e
+        logger.debug e.backtrace.join("\n\t")
+        raise e
       rescue StandardError => e
         logger.debug response.body if response
         logger.debug e.backtrace.join("\n\t")
