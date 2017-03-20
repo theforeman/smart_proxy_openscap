@@ -16,11 +16,21 @@ module Proxy::OpenSCAP
       size         = arf_data.size
       @arf_digest  = Digest::SHA256.hexdigest(arf_data)
       @arf         = OpenSCAP::DS::Arf.new(:content => arf_data, :path => 'arf.xml.bz2', :length => size)
-      @results     = @arf.test_result.rr
-      sds          = @arf.report_request
-      bench_source = sds.select_checklist!
-      @bench       = OpenSCAP::Xccdf::Benchmark.new(bench_source)
-      @items       = @bench.items
+      @test_result  = @arf.test_result
+
+      @results      = @test_result.rr
+      @sds          = @arf.report_request
+      bench_source = @sds.select_checklist!
+      @benchmark    = OpenSCAP::Xccdf::Benchmark.new(bench_source)
+      @items        = @benchmark.items
+    end
+
+    def cleanup
+      @test_result.destroy if @test_result
+      @benchmark.destroy if @benchmark
+      @sds.destroy if @sds
+      @arf.destroy if @arf
+      OpenSCAP.oscap_cleanup
     end
 
     def as_json

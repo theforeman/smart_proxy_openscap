@@ -3,10 +3,10 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
 
     def post_arf_report(cname, policy_id, date, data)
+        parser = Proxy::OpenSCAP::Parse.new(data)
       begin
-        json_data = Proxy::OpenSCAP::Parse.new(data).as_json
         foreman_api_path = upload_path(cname, policy_id, date)
-        response = send_request(foreman_api_path, json_data)
+        response = send_request(foreman_api_path, parser.as_json)
         # Raise an HTTP error if the response is not 2xx (success).
         response.value
         res = JSON.parse(response.body)
@@ -18,6 +18,8 @@ module Proxy::OpenSCAP
         logger.debug response.body if response
         logger.debug e.backtrace.join("\n\t")
         raise e
+      ensure
+        parser.cleanup
       end
       res
     end
