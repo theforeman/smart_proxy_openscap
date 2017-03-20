@@ -11,6 +11,11 @@ module Proxy::OpenSCAP
       @type = type
     end
 
+    def cleanup
+      @source.destroy if @source
+      OpenSCAP.oscap_cleanup
+    end
+
     def allowed_types
       {
         'tailoring_file' => 'XCCDF Tailoring',
