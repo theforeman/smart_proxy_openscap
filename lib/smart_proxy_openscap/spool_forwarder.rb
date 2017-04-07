@@ -54,8 +54,9 @@ module Proxy::OpenSCAP
     rescue OpenSCAP::OpenSCAPError => e
       logger.error "Failed to parse Arf Report at #{arf_file_path}, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
 
-      Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cname, policy_id, date)
-                                .move_corrupted(arf_file_path.split('/').last)
+      Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cname, policy_id, date).
+        move_corrupted(arf_file_path.split('/').last)
+
     rescue StandardError => e
       logger.error "smart-proxy-openscap-send failed to upload Compliance report for #{cname}, generated on #{Time.at date.to_i}. Cause: #{e}"
     end
