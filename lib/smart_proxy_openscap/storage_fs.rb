@@ -32,9 +32,12 @@ module Proxy::OpenSCAP
       xml = get_arf_file(digest)[:xml]
       size = get_arf_file(digest)[:size]
       arf_object = OpenSCAP::DS::Arf.new(:content => xml, :path => 'arf.xml.bz2', :length => size)
+      html = arf_object.html
       # @TODO: Drop this when support for 1.8.7 ends
-      return arf_object.html if RUBY_VERSION.start_with? '1.8'
-      arf_object.html.force_encoding('UTF-8')
+      html = html.force_encoding('UTF-8') unless RUBY_VERSION.start_with? '1.8'
+      arf_object.destroy if arf_object
+      OpenSCAP.oscap_cleanup
+      html
     end
 
     def delete_arf_file
