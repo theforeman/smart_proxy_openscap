@@ -28,7 +28,6 @@ module Proxy::OpenSCAP
     end
 
     def get_arf_html(digest)
-      OpenSCAP.oscap_init
       xml = get_arf_file(digest)[:xml]
       size = get_arf_file(digest)[:size]
       arf_object = OpenSCAP::DS::Arf.new(:content => xml, :path => 'arf.xml.bz2', :length => size)
