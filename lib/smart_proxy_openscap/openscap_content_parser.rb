@@ -6,14 +6,12 @@ require 'openscap/xccdf/tailoring'
 module Proxy::OpenSCAP
   class ContentParser
     def initialize(scap_file, type = 'scap_content')
-      OpenSCAP.oscap_init
       @source = OpenSCAP::Source.new(:content => scap_file)
       @type = type
     end
 
     def cleanup
       @source.destroy if @source
-      OpenSCAP.oscap_cleanup
     end
 
     def allowed_types

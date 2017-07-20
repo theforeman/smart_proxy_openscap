@@ -9,6 +9,7 @@
 #
 
 require 'smart_proxy_openscap/version'
+require 'smart_proxy_openscap/plugin_configuration'
 
 module Proxy::OpenSCAP
   class Plugin < ::Proxy::Plugin
@@ -23,5 +24,10 @@ module Proxy::OpenSCAP
                      :reportsdir => File.join(APP_ROOT, 'openscap/reports'),
                      :failed_dir => File.join(APP_ROOT, 'openscap/failed'),
                      :tailoring_dir => File.join(APP_ROOT, 'openscap/tailoring')
+
+    load_classes ::Proxy::OpenSCAP::PluginConfiguration
+    load_dependency_injection_wirings ::Proxy::OpenSCAP::PluginConfiguration
+
+    start_services :openscap_initializer
   end
 end
