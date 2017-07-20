@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+path = File.join(File.dirname(File.expand_path(__FILE__)), '..', 'lib')
+$:.unshift(path) if File.exist? path
+
+require 'smart_proxy_openscap/arf_parser'
+
+Proxy::OpenSCAP::ArfParser.new.parse ARGV[0], ARGV[1]
