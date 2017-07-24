@@ -1,6 +1,4 @@
 require 'smart_proxy_openscap/openscap_exception'
-require 'openscap'
-require 'openscap/ds/arf'
 
 module Proxy::OpenSCAP
   class Storage

@@ -39,9 +39,7 @@ class OpenSCAPGetArfTest < Test::Unit::TestCase
   end
 
   def test_get_html_arf
-    OpenSCAP.oscap_init
     get "/arf/#{@arf_id}/#{@cname}/#{@date}/#{@filename}/html"
-    OpenSCAP.oscap_cleanup
     assert(last_response.successful?, "Should return OK")
     assert(last_response.body.start_with?('<!DOCTYPE'), 'File should start with html')
   end
