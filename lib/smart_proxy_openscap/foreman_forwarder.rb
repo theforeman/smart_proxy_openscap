@@ -5,8 +5,7 @@ module Proxy::OpenSCAP
     def post_arf_report(cname, policy_id, date, data)
       begin
         foreman_api_path = upload_path(cname, policy_id, date)
-        json = Proxy::OpenSCAP::Parse.new(cname, policy_id, date).as_json(data)
-        raise OpenSCAP::OpenSCAPError, "Failed to parse report" if json.nil? || json.empty?
+        json = Proxy::OpenSCAP::ArfParser.new(cname, policy_id, date).as_json(data)
         response = send_request(foreman_api_path, json)
         # Raise an HTTP error if the response is not 2xx (success).
         response.value

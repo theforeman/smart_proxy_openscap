@@ -16,12 +16,14 @@ require 'proxy/error'
 require 'proxy/request'
 require 'smart_proxy_openscap/fetch_scap_content'
 require 'smart_proxy_openscap/foreman_forwarder'
-require 'smart_proxy_openscap/openscap_content_parser'
+require 'smart_proxy_openscap/content_parser'
 require 'smart_proxy_openscap/openscap_exception'
-require 'smart_proxy_openscap/openscap_report_parser'
+require 'smart_proxy_openscap/arf_parser'
 require 'smart_proxy_openscap/spool_forwarder'
-require 'smart_proxy_openscap/storage_fs'
+require 'smart_proxy_openscap/openscap_html_generator'
 require 'smart_proxy_openscap/fetch_tailoring_file'
+require 'smart_proxy_openscap/policy_parser'
+require 'smart_proxy_openscap/profiles_parser'
 
 module Proxy::OpenSCAP
   extend ::Proxy::Log

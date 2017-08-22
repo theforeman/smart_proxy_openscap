@@ -51,7 +51,7 @@ module Proxy::OpenSCAP
       post_to_foreman = ForemanForwarder.new.post_arf_report(cname, policy_id, date, data)
       Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
       File.delete arf_file_path
-    rescue OpenSCAP::OpenSCAPError => e
+    rescue Proxy::OpenSCAP::OpenSCAPException => e
       logger.error "Failed to parse Arf Report at #{arf_file_path}, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
 
       Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cname, policy_id, date).

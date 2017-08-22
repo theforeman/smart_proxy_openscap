@@ -42,7 +42,7 @@ module Proxy::OpenSCAP
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.failed_dir, cn, post_to_foreman['id'], date).store_failed(request.body.string)
         logger.error "Failed to save Report in reports directory (#{Proxy::OpenSCAP::Plugin.settings.reportsdir}). Failed with: #{e.message}.
                       Saving file in #{Proxy::OpenSCAP::Plugin.settings.failed_dir}. Please copy manually to #{Proxy::OpenSCAP::Plugin.settings.reportsdir}"
-      rescue OpenSCAP::OpenSCAPError => e
+      rescue Proxy::OpenSCAP::OpenSCAPException => e
         logger.error "Failed to parse Arf Report, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cn, policy, date).store_corrupted(request.body.string)
       rescue *HTTP_ERRORS => e
@@ -73,9 +73,11 @@ module Proxy::OpenSCAP
 
     get "/arf/:id/:cname/:date/:digest/html" do
       begin
-        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date]).get_arf_html(params[:digest])
+        Proxy::OpenSCAP::OpenscapHtmlGenerator.new(params[:cname], params[:id], params[:date], params[:digest]).get_html
       rescue FileNotFound => e
         log_halt 500, "Could not find requested file, #{e.message}"
+      rescue OpenSCAPException => e
+        log_halt 500, "Could not generate report in HTML"
       end
     end
 
@@ -114,28 +116,22 @@ module Proxy::OpenSCAP
     end
 
     post "/scap_content/policies" do
-      content_parser = create_content_parser
       begin
-        content_parser.extract_policies
+        Proxy::OpenSCAP::ProfilesParser.new('scap_content').profiles(request.body.string)
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
         log_halt 500, "Error occurred: #{e.message}"
-      ensure
-        content_parser.cleanup
       end
     end
 
     post "/tailoring_file/profiles" do
-      content_parser = create_content_parser
       begin
-        content_parser.get_profiles
+        Proxy::OpenSCAP::ProfilesParser.new('tailoring_file').profiles(request.body.string)
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
         log_halt 500, "Error occurred: #{e.message}"
-      ensure
-        content_parser.cleanup
       end
     end
 
@@ -150,15 +146,12 @@ module Proxy::OpenSCAP
     end
 
     post "/scap_content/guide/:policy" do
-      content_parser = create_content_parser
       begin
-        content_parser.guide(params[:policy])
+        Proxy::OpenSCAP::PolicyParser.new(params[:policy]).guide(request.body.string)
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
         log_halt 500, "Error occurred: #{e.message}"
-      ensure
-        content_parser.cleanup
       end
     end
 
@@ -166,16 +159,12 @@ module Proxy::OpenSCAP
 
     def validate_scap_file(params)
       begin
-        Proxy::OpenSCAP::ContentParser.new(request.body.string, params[:type]).validate
+        Proxy::OpenSCAP::ContentParser.new(params[:type]).validate(request.body.string)
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
         log_halt 500, "Error occurred: #{e.message}"
       end
-    end
-
-    def create_content_parser
-      Proxy::OpenSCAP::ContentParser.new(request.body.string)
     end
   end
 end
