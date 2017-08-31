@@ -145,7 +145,7 @@ module Proxy::OpenSCAP
       validate_scap_file params
     end
 
-    post "/scap_content/guide/:policy" do
+    post "/scap_content/guide/?:policy?" do
       begin
         Proxy::OpenSCAP::PolicyParser.new(params[:policy]).guide(request.body.string)
       rescue *HTTP_ERRORS => e

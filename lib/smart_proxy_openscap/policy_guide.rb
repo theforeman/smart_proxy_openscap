@@ -6,7 +6,7 @@ require 'json'
 module Proxy
   module OpenSCAP
     class PolicyGuide
-      def generate_guide(in_file, out_file, policy)
+      def generate_guide(in_file, out_file, policy=nil)
         ::OpenSCAP.oscap_init
         source = ::OpenSCAP::Source.new in_file
         sds = ::OpenSCAP::DS::Sds.new source
