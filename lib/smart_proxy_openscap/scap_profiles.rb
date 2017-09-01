@@ -33,7 +33,7 @@ module Proxy
 
       def collect_profiles(profile_source)
         profile_source.profiles.inject({}) do |memo, (key, profile)|
-          memo.tap { |hash| hash[key] = profile.title }
+          memo.tap { |hash| hash[key] = profile.title.strip }
         end
       end
 
