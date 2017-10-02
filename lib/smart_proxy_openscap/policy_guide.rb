@@ -14,8 +14,9 @@ module Proxy
         profile_id = policy ? nil : policy
         html = sds.html_guide profile_id
         File.write(out_file, { :html => html.force_encoding('UTF-8') }.to_json)
-        sds.destroy
-        source.destroy
+      ensure
+        sds.destroy if sds
+        source.destroy if source
         ::OpenSCAP.oscap_cleanup
       end
     end
