@@ -7,6 +7,7 @@ module Proxy
       def generate_html(file_in, file_out)
         ::OpenSCAP.oscap_init
         File.write file_out, get_arf_html(file_in)
+      ensure
         ::OpenSCAP.oscap_cleanup
       end
 

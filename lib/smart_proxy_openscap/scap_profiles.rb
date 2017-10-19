@@ -13,22 +13,25 @@ module Proxy
         source = ::OpenSCAP::Source.new(in_file)
         json = type == 'scap_content' ? scap_content_profiles(source) : tailoring_profiles(source)
         File.write out_file, json
-        source.destroy
+      ensure
+        source.destroy if source
         ::OpenSCAP.oscap_cleanup
       end
 
       def scap_content_profiles(source)
         bench = benchmark_profiles source
         profiles = collect_profiles bench
-        bench.destroy
         profiles.to_json
+      ensure
+        bench.destroy if bench
       end
 
       def tailoring_profiles(source)
         tailoring = ::OpenSCAP::Xccdf::Tailoring.new(source, nil)
         profiles = collect_profiles tailoring
-        tailoring.destroy
         profiles.to_json
+      ensure
+        tailoring.destroy if tailoring
       end
 
       def collect_profiles(profile_source)
@@ -41,8 +44,8 @@ module Proxy
         sds          = ::OpenSCAP::DS::Sds.new(source)
         bench_source = sds.select_checklist!
         benchmark = ::OpenSCAP::Xccdf::Benchmark.new(bench_source)
-        sds.destroy
-        benchmark
+      ensure
+        sds.destroy if sds
       end
     end
   end

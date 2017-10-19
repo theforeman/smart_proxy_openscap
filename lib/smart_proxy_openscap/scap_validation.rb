@@ -26,7 +26,8 @@ module Proxy
           errors << "Invalid SCAP file type"
         end
         File.write out_file, { :errors => errors }.to_json
-        source.destroy
+      ensure
+        source.destroy if source
         ::OpenSCAP.oscap_cleanup
       end
     end
