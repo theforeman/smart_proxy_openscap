@@ -10,6 +10,6 @@
 
 module Proxy
   module OpenSCAP
-    VERSION = '0.6.8'
+    VERSION = '0.6.9'
   end
 end
