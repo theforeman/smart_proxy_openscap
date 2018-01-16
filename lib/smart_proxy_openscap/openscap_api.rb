@@ -14,6 +14,7 @@ module Proxy::OpenSCAP
     EOFError,
     Errno::ECONNRESET,
     Errno::EINVAL,
+    Errno::ECONNREFUSED,
     Net::HTTPBadResponse,
     Net::HTTPHeaderSyntaxError,
     Net::ProtocolError,
