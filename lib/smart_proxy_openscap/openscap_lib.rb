@@ -13,6 +13,8 @@ require 'fileutils'
 require 'pathname'
 require 'json'
 require 'proxy/error'
+require 'yaml'
+require 'ostruct'
 require 'proxy/request'
 require 'smart_proxy_openscap/fetch_scap_content'
 require 'smart_proxy_openscap/foreman_forwarder'
@@ -27,6 +29,15 @@ require 'smart_proxy_openscap/profiles_parser'
 
 module Proxy::OpenSCAP
   extend ::Proxy::Log
+
+  def self.plugin_settings
+    @@settings ||= OpenStruct.new(read_settings)
+  end
+
+  def self.read_settings
+    YAML.load_file(File.join(::Proxy::SETTINGS.settings_directory, ::Proxy::OpenSCAP::Plugin.settings_file))
+      .merge(::Proxy::OpenSCAP::Plugin.default_settings)
+  end
 
   def self.common_name(request)
     client_cert = request.env['SSL_CLIENT_CERT']
@@ -43,10 +54,10 @@ module Proxy::OpenSCAP
     cn
   end
 
-  def self.send_spool_to_foreman
-    arf_dir = File.join(Proxy::OpenSCAP::Plugin.settings.spooldir, "/arf")
+  def self.send_spool_to_foreman(loaded_settings)
+    arf_dir = File.join(loaded_settings.spooldir, "/arf")
     return unless File.exist? arf_dir
-    SpoolForwarder.new.post_arf_from_spool(arf_dir)
+    SpoolForwarder.new(loaded_settings).post_arf_from_spool(arf_dir)
   end
 
   def self.fullpath(path = Proxy::OpenSCAP::Plugin.settings.contentdir)

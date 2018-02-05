@@ -17,14 +17,16 @@ require 'smart_proxy_main'
 require 'smart_proxy_openscap'
 require 'smart_proxy_openscap/openscap_lib'
 
-# Don't run if OpenSCAP plugin is disabled.
-exit unless Proxy::OpenSCAP::Plugin.settings.enabled == true
+loaded_settings = Proxy::OpenSCAP.plugin_settings
 
-# TODO: include some jitter to not bring Foreman to its knees
+# Don't run if OpenSCAP plugin is disabled or settings are missing.
+if !loaded_settings.enabled || loaded_settings.nil? || loaded_settings.empty?
+  exit 436
+end
 
 module Proxy
   module Log
-    @@logger = ::Logger.new(Proxy::OpenSCAP.fullpath(Proxy::OpenSCAP::Plugin.settings.openscap_send_log_file), 6, 1024*1024*10)
+    @@logger = ::Logger.new(Proxy::OpenSCAP.fullpath(Proxy::OpenSCAP.plugin_settings.openscap_send_log_file), 6, 1024*1024*10)
     @@logger.level = ::Logger.const_get(Proxy::SETTINGS.log_level.upcase)
   end
 end
@@ -32,13 +34,13 @@ include Proxy::Log
 
 if !Proxy::SETTINGS.foreman_url
   logger.error "Foreman URL not configured"
-  exit false
+  exit 437
 end
 
 begin
-  Proxy::OpenSCAP::send_spool_to_foreman
+  Proxy::OpenSCAP::send_spool_to_foreman(loaded_settings)
 rescue StandardError => e
   logger.error e
-  puts "#{e} See #{Proxy::OpenSCAP.fullpath(Proxy::OpenSCAP::Plugin.settings.openscap_send_log_file)}"
-  exit false
+  puts "#{e} See #{Proxy::OpenSCAP.fullpath(loaded_settings.openscap_send_log_file)}"
+  exit 438
 end
