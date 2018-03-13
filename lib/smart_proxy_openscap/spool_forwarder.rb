@@ -2,6 +2,10 @@ module Proxy::OpenSCAP
   class SpoolForwarder
     include ::Proxy::Log
 
+    def initialize(loaded_settings)
+      @loaded_settings = loaded_settings
+    end
+
     def post_arf_from_spool(arf_dir)
       Dir.foreach(arf_dir) do |cname|
         next if cname == '.' || cname == '..'
@@ -49,12 +53,12 @@ module Proxy::OpenSCAP
     def forward_arf_file(cname, policy_id, date, arf_file_path)
       data = File.open(arf_file_path, 'rb') { |io| io.read }
       post_to_foreman = ForemanForwarder.new.post_arf_report(cname, policy_id, date, data)
-      Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
+      Proxy::OpenSCAP::StorageFS.new(@loaded_settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
       File.delete arf_file_path
     rescue Proxy::OpenSCAP::OpenSCAPException => e
-      logger.error "Failed to parse Arf Report at #{arf_file_path}, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
+      logger.error "Failed to parse Arf Report at #{arf_file_path}, moving to #{@loaded_settings.corrupted_dir}"
 
-      Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cname, policy_id, date).
+      Proxy::OpenSCAP::StorageFS.new(@loaded_settings.corrupted_dir, cname, policy_id, date).
         move_corrupted(arf_file_path.split('/').last)
 
     rescue StandardError => e
