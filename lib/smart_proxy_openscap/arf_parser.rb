@@ -28,7 +28,11 @@ module Proxy
       end
 
       def command(in_file, out_file)
-        "#{script_location} #{in_file.path} #{out_file.path}"
+        "#{script_location} " <<
+        "#{in_file.path} " <<
+        "#{out_file.path} " <<
+        "#{Proxy::OpenSCAP::Plugin.settings.registered_proxy_name} " <<
+        "#{Proxy::OpenSCAP::Plugin.settings.registered_proxy_url}"
       end
     end
   end

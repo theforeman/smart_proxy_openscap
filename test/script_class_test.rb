@@ -17,10 +17,12 @@ class ScriptClassTest < Test::Unit::TestCase
 
   def test_arf_as_json
     carry_out do |tmp|
-      Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path)
+      Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path, 'my-proxy', 'http://test-proxy.org')
       json = read_json tmp
       refute json['logs'].empty?
       refute json['metrics'].empty?
+      refute json['openscap_proxy_name'].empty?
+      refute json['openscap_proxy_url'].empty?
     end
   end
 
@@ -53,7 +55,7 @@ class ScriptClassTest < Test::Unit::TestCase
 
   def test_arf_json
     carry_out do |tmp|
-      Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path)
+      Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path, 'my-proxy', 'http://test-proxy.org')
       json = read_json tmp
       refute json['logs'].empty?
       refute json['metrics'].empty?
