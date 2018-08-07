@@ -18,8 +18,8 @@ module Proxy::OpenSCAP
       store(data, StoreCorruptedError)
     end
 
-    def move_corrupted(digest)
-      source = "#{Proxy::OpenSCAP::Plugin.settings.spooldir}/#{@namespace}/#{@cname}/#{@id}/#{@date}"
+    def move_corrupted(digest, spooldir)
+      source = "#{spooldir}/#{@namespace}/#{@cname}/#{@id}/#{@date}"
       move "#{source}/#{digest}", StoreCorruptedError
     end
 
