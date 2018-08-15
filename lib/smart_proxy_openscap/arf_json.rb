@@ -12,7 +12,7 @@ require 'digest'
 module Proxy
   module OpenSCAP
     class ArfJson
-      def as_json(file_in, file_out)
+      def as_json(file_in, file_out, proxy_name, proxy_url)
         ::OpenSCAP.oscap_init
         arf_digest   = Digest::SHA256.hexdigest(File.read(file_in))
 
@@ -26,6 +26,9 @@ module Proxy
         items        = benchmark.items
 
         report = parse_results(items, results, arf_digest)
+        report[:openscap_proxy_name] = proxy_name
+        report[:openscap_proxy_url] = proxy_url
+
         File.write file_out, report.to_json
       ensure
         cleanup test_result, benchmark, sds, arf
