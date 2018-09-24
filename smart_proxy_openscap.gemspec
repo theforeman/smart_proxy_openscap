@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
 
   s.author = ['Šimon Lukašík', 'Shlomi Zadok', 'Marek Hulan']
   s.email = 'slukasik@redhat.com'
-  s.homepage = 'http://github.com/OpenSCAP/smart_proxy_openscap'
-  s.license = 'GPL-3'
+  s.homepage = 'https://github.com/theforeman/smart_proxy_openscap'
+  s.license = 'GPL-3.0-or-later'
 
   s.files = `git ls-files`.split("\n") - ['.gitignore']
   s.executables = ['smart-proxy-openscap-send']
