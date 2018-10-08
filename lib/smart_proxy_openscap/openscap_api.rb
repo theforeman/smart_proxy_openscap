@@ -156,6 +156,14 @@ module Proxy::OpenSCAP
       end
     end
 
+    get "/spool_errors" do
+      begin
+        Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, nil, nil, nil).spool_errors.to_json
+      rescue StandardError => e
+        log_halt 500, "Error occurred: #{e.message}"
+      end
+    end
+
     private
 
     def validate_scap_file(params)

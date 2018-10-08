@@ -35,8 +35,8 @@ module Proxy::OpenSCAP
   end
 
   def self.read_settings
-    YAML.load_file(File.join(::Proxy::SETTINGS.settings_directory, ::Proxy::OpenSCAP::Plugin.settings_file))
-      .merge(::Proxy::OpenSCAP::Plugin.default_settings)
+    ::Proxy::OpenSCAP::Plugin.default_settings.merge(
+      YAML.load_file(File.join(::Proxy::SETTINGS.settings_directory, ::Proxy::OpenSCAP::Plugin.settings_file)))
   end
 
   def self.common_name(request)

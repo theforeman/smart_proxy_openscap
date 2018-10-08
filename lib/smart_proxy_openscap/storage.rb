@@ -41,7 +41,7 @@ module Proxy::OpenSCAP
     private
 
     def validate_id(id)
-      raise Proxy::OpenSCAP::OpenSCAPException, 'Malformed ARF ID' unless /\A\d+\Z/ =~ id
+      raise Proxy::OpenSCAP::OpenSCAPException, 'Malformed ARF ID' if (id.is_a?(String) && !id.match(/\A\d+\Z/))
     end
   end
 end

@@ -1,3 +1,4 @@
+require 'pathname'
 require 'smart_proxy_openscap/storage'
 
 module Proxy::OpenSCAP
@@ -43,6 +44,15 @@ module Proxy::OpenSCAP
       full_path = @path + digest
       raise FileNotFound, "Can't find path #{full_path}" if !File.file?(full_path) || File.zero?(full_path)
       full_path
+    end
+
+    def spool_errors
+      path = "#{@path_to_dir}/#{@namespace}"
+      { :errors_count => File.exists?(path) ? list_dirs(path).count : 0 }
+    end
+
+    def list_dirs(path)
+      Pathname.new(path).children.select(&:directory?)
     end
 
     private
