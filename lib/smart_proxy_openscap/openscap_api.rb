@@ -37,7 +37,7 @@ module Proxy::OpenSCAP
       policy = params[:policy]
 
       begin
-        post_to_foreman = ForemanForwarder.new.post_arf_report(cn, policy, date, request.body.string)
+        post_to_foreman = ForemanForwarder.new.post_arf_report(cn, policy, date, request.body.string, Proxy::OpenSCAP::Plugin.settings.timeout)
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, cn, post_to_foreman['id'], date).store_archive(request.body.string)
         post_to_foreman.to_json
       rescue Proxy::OpenSCAP::StoreReportError => e

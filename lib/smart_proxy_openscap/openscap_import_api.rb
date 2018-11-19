@@ -12,7 +12,7 @@ module Proxy::OpenSCAP
       policy = params[:policy_id]
       log_halt(500, "Insufficient data") if (cn.nil? || date.nil?)
 
-      post_to_foreman = ForemanForwarder.new.post_arf_report(cn, policy, date, request.body.string)
+      post_to_foreman = ForemanForwarder.new.post_arf_report(cn, policy, date, request.body.string, Proxy::OpenSCAP::Plugin.settings.timeout)
       begin
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, cn, post_to_foreman['id'], date).store_archive(request.body.string)
       rescue Proxy::OpenSCAP::StoreReportError => e
