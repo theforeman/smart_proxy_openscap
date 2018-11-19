@@ -58,6 +58,8 @@ module Proxy::OpenSCAP
         { :result => msg }.to_json
       rescue Proxy::OpenSCAP::StoreSpoolError => e
         log_halt 500, e.message
+      rescue Proxy::OpenSCAP::ReportUploadError => e
+        { :result => e.message }.to_json
       end
     end
 
