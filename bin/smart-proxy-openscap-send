@@ -37,10 +37,25 @@ if !Proxy::SETTINGS.foreman_url
   exit 437
 end
 
+lockfile = File.join(loaded_settings.spooldir, "spool.lock")
+
+Signal.trap("TERM") {
+  FileUtils.rm(lockfile) if File.exist?(lockfile)
+  exit
+}
+
+if File.exist? lockfile
+  logger.debug "Lock file #{lockfile} for openscap spool exists, not sending spool to server"
+  exit
+end
+
 begin
+  FileUtils.touch lockfile
   Proxy::OpenSCAP::send_spool_to_foreman(loaded_settings)
 rescue StandardError => e
   logger.error e
   puts "#{e} See #{Proxy::OpenSCAP.fullpath(loaded_settings.openscap_send_log_file)}"
   exit 438
+ensure
+  FileUtils.rm lockfile
 end
