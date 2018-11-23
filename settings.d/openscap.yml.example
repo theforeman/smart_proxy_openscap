@@ -26,3 +26,8 @@
 # Directory where corrupted OpenSCAP report XML are stored
 # When proxy cannot parse the report sent by client
 #:corrupted_dir: /var/lib/foreman-proxy/openscap/corrupted
+
+# The time we wait for response after the upload request connection was established, in seconds.
+# Affects sending reports to Foreman (directly and from spool) and fetching scap content or tailoring file
+# for distribution to clients
+#:timeout: 60

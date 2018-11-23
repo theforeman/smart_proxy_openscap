@@ -46,6 +46,8 @@ module Proxy::OpenSCAP
     def fetch_scap_content_xml(file_download_path)
       foreman_request = Proxy::HttpRequest::ForemanRequest.new
       req = foreman_request.request_factory.create_get(file_download_path)
+      timeout = Proxy::OpenSCAP::Plugin.settings.timeout
+      foreman_request.http.read_timeout = timeout if timeout
       response = foreman_request.send_request(req)
       response.value
       response.body
