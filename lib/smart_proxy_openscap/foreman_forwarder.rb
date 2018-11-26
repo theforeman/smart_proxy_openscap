@@ -1,3 +1,5 @@
+require 'smart_proxy_openscap/openscap_exception'
+
 module Proxy::OpenSCAP
   class ForemanForwarder < Proxy::HttpRequest::ForemanRequest
     include ::Proxy::Log
@@ -9,14 +11,13 @@ module Proxy::OpenSCAP
         response = send_request(foreman_api_path, json, timeout)
         # Raise an HTTP error if the response is not 2xx (success).
         response.value
-        res = JSON.parse(response.body)
-        raise StandardError, "Received response: #{response.code} #{response.msg}" unless res['result'] == 'OK'
-      rescue StandardError => e
-        logger.debug response.body if response
-        logger.debug e.backtrace.join("\n\t")
+        JSON.parse(response.body)
+      rescue Net::HTTPServerException => e
+        logger.debug "Received response: #{response.code} #{response.msg}"
+        logger.debug response.body
+        raise ReportUploadError, e.message if response.code.to_i == 422
         raise e
       end
-      res
     end
 
     private
