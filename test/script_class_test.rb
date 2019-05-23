@@ -28,7 +28,7 @@ class ScriptClassTest < Test::Unit::TestCase
 
   def test_policy_guide
     carry_out do |tmp|
-      profile = "xccdf_org.ssgproject.content_profile_stig-rhel7-workstation-upstream"
+      profile = "xccdf_org.ssgproject.content_profile_stig-rhel7-server-upstream"
       Proxy::OpenSCAP::PolicyGuide.new.generate_guide("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, profile)
       guide = read_json tmp
       assert guide['html'].start_with?('<!DOCTYPE'), "File should be html"
