@@ -37,7 +37,7 @@ class ScapContentParserApiTest < Test::Unit::TestCase
 
   def test_invalid_scap_content_policies
     post '/scap_content/policies', '<xml>blah</xml>', 'CONTENT_TYPE' => 'text/xml'
-    assert(last_response.body.include?('Failure when running script which extracts profiles from scap file'))
+    assert(last_response.body.include?('Failed to parse profiles'))
   end
 
   def test_scap_content_validator

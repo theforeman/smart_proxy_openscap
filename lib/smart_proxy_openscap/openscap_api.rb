@@ -126,7 +126,7 @@ module Proxy::OpenSCAP
 
     post "/scap_content/policies" do
       begin
-        Proxy::OpenSCAP::ProfilesParser.new('scap_content').profiles(request.body.string)
+        Proxy::OpenSCAP::ProfilesParser.new.profiles('scap_content', request.body.string)
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
@@ -136,7 +136,7 @@ module Proxy::OpenSCAP
 
     post "/tailoring_file/profiles" do
       begin
-        Proxy::OpenSCAP::ProfilesParser.new('tailoring_file').profiles(request.body.string)
+        Proxy::OpenSCAP::ProfilesParser.new.profiles('tailoring_file', request.body.string)
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e
