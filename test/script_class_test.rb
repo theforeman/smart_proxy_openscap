@@ -1,8 +1,6 @@
 require 'test_helper'
 require 'smart_proxy_openscap/arf_html'
-require 'smart_proxy_openscap/arf_json'
 require 'smart_proxy_openscap/policy_guide'
-require 'smart_proxy_openscap/arf_json'
 
 class ScriptClassTest < Test::Unit::TestCase
   def test_arf_generate_html
@@ -13,32 +11,12 @@ class ScriptClassTest < Test::Unit::TestCase
     end
   end
 
-  def test_arf_as_json
-    carry_out do |tmp|
-      Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path, 'my-proxy', 'http://test-proxy.org')
-      json = read_json tmp
-      refute_empty json['logs']
-      refute_empty json['metrics']
-      refute_empty json['openscap_proxy_name']
-      refute_empty json['openscap_proxy_url']
-    end
-  end
-
   def test_policy_guide
     carry_out do |tmp|
       profile = "xccdf_org.ssgproject.content_profile_rht-ccp"
       Proxy::OpenSCAP::PolicyGuide.new.generate_guide("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, profile)
       guide = read_json tmp
       assert guide['html'].start_with?('<!DOCTYPE'), "File should be html"
-    end
-  end
-
-  def test_arf_json
-    carry_out do |tmp|
-      Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path, 'my-proxy', 'http://test-proxy.org')
-      json = read_json tmp
-      refute_empty json['logs']
-      refute_empty json['metrics']
     end
   end
 

@@ -45,7 +45,7 @@ module Proxy::OpenSCAP
         logger.error "Failed to save Report in reports directory (#{Proxy::OpenSCAP::Plugin.settings.reportsdir}). Failed with: #{e.message}.
                       Saving file in #{Proxy::OpenSCAP::Plugin.settings.failed_dir}. Please copy manually to #{Proxy::OpenSCAP::Plugin.settings.reportsdir}"
         { :result => 'Storage failure on proxy, see proxy logs for details' }.to_json
-      rescue Proxy::OpenSCAP::OpenSCAPException => e
+      rescue Nokogiri::XML::SyntaxError => e
         error = "Failed to parse Arf Report, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
         logger.error error
         Proxy::OpenSCAP::StorageFS.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cn, policy, date).store_corrupted(request.body.string)
@@ -58,7 +58,7 @@ module Proxy::OpenSCAP
         { :result => msg }.to_json
       rescue Proxy::OpenSCAP::StoreSpoolError => e
         log_halt 500, e.message
-      rescue Proxy::OpenSCAP::ReportUploadError => e
+      rescue Proxy::OpenSCAP::ReportUploadError, Proxy::OpenSCAP::ReportDecompressError => e
         { :result => e.message }.to_json
       end
     end
