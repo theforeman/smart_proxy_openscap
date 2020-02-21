@@ -43,7 +43,7 @@ module Proxy
       def benchmark_profiles(source)
         sds          = ::OpenSCAP::DS::Sds.new(source)
         bench_source = sds.select_checklist!
-        benchmark = ::OpenSCAP::Xccdf::Benchmark.new(bench_source)
+        ::OpenSCAP::Xccdf::Benchmark.new(bench_source)
       ensure
         sds.destroy if sds
       end
