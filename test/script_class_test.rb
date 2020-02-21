@@ -91,6 +91,7 @@ class ScriptClassTest < Test::Unit::TestCase
   end
 
   def read_json(file)
+    file.flush
     JSON.parse(File.read file)
   end
 end
