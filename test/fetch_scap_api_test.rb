@@ -34,7 +34,7 @@ class FetchScapApiTest < Test::Unit::TestCase
     get "/policies/#{@policy_id}/content/#{@digest}"
     assert_equal("application/xml;charset=utf-8", last_response.header["Content-Type"], "Response header should be application/xml")
     assert File.file?("#{@results_path}/#{@policy_id}/#{@policy_id}_#{@digest}.xml")
-    assert_equal(@scap_content.length, last_response.length, "Scap content should be equal")
+    assert_equal(@scap_content.force_encoding("utf-8").length, last_response.body.force_encoding("utf-8").length, "Scap content should be equal")
   end
 
   def test_get_scap_content_from_file
@@ -43,7 +43,7 @@ class FetchScapApiTest < Test::Unit::TestCase
     FileUtils.cp("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", "#{@results_path}/#{@policy_id}/#{@policy_id}_#{@digest}.xml")
     get "/policies/#{@policy_id}/content/#{@digest}"
     assert_equal("application/xml;charset=utf-8", last_response.header["Content-Type"], "Response header should be application/xml")
-    assert_equal(@scap_content.length, last_response.length, "Scap content should be equal")
+    assert_equal(@scap_content.force_encoding("utf-8").length, last_response.body.force_encoding("utf-8").length, "Scap content should be equal")
     assert(last_response.successful?, "Response should be success")
   end
 
@@ -67,7 +67,7 @@ class FetchScapApiTest < Test::Unit::TestCase
     get "/policies/#{@policy_id}/content/#{@digest}"
     refute(File.file?("#{@results_path}/#{@policy_id}/#{@policy_id}_#{@digest}.xml"), "Scap file should be saved")
     assert_equal("application/xml;charset=utf-8", last_response.header["Content-Type"], "Response header should be application/xml")
-    assert_equal(@scap_content.length, last_response.length, "Scap content should be equal")
+    assert_equal(@scap_content.force_encoding("utf-8").length, last_response.body.force_encoding('utf-8').length, "Scap content should be equal")
     assert(last_response.successful?, "Response should be success")
   end
 end

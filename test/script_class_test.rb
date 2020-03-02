@@ -19,16 +19,16 @@ class ScriptClassTest < Test::Unit::TestCase
     carry_out do |tmp|
       Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path, 'my-proxy', 'http://test-proxy.org')
       json = read_json tmp
-      refute json['logs'].empty?
-      refute json['metrics'].empty?
-      refute json['openscap_proxy_name'].empty?
-      refute json['openscap_proxy_url'].empty?
+      refute_empty json['logs']
+      refute_empty json['metrics']
+      refute_empty json['openscap_proxy_name']
+      refute_empty json['openscap_proxy_url']
     end
   end
 
   def test_policy_guide
     carry_out do |tmp|
-      profile = "xccdf_org.ssgproject.content_profile_stig-rhel7-server-upstream"
+      profile = "xccdf_org.ssgproject.content_profile_rht-ccp"
       Proxy::OpenSCAP::PolicyGuide.new.generate_guide("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, profile)
       guide = read_json tmp
       assert guide['html'].start_with?('<!DOCTYPE'), "File should be html"
@@ -39,8 +39,8 @@ class ScriptClassTest < Test::Unit::TestCase
     carry_out do |tmp|
       Proxy::OpenSCAP::ScapProfiles.new.profiles("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, 'scap_content')
       profiles = read_json tmp
-      refute profiles.empty?
-      assert profiles["xccdf_org.ssgproject.content_profile_common"]
+      refute_empty profiles
+      assert profiles["xccdf_org.ssgproject.content_profile_standard"]
     end
   end
 
@@ -48,7 +48,7 @@ class ScriptClassTest < Test::Unit::TestCase
     carry_out do |tmp|
       Proxy::OpenSCAP::ScapProfiles.new.profiles("#{Dir.getwd}/test/data/tailoring.xml", tmp.path, 'tailoring_file')
       profiles = read_json tmp
-      refute profiles.empty?
+      refute_empty profiles
       assert profiles["xccdf_org.ssgproject.content_profile_stig-firefox-upstream_customized"]
     end
   end
@@ -57,8 +57,8 @@ class ScriptClassTest < Test::Unit::TestCase
     carry_out do |tmp|
       Proxy::OpenSCAP::ArfJson.new.as_json("#{Dir.getwd}/test/data/arf_report", tmp.path, 'my-proxy', 'http://test-proxy.org')
       json = read_json tmp
-      refute json['logs'].empty?
-      refute json['metrics'].empty?
+      refute_empty json['logs']
+      refute_empty json['metrics']
     end
   end
 
@@ -66,7 +66,7 @@ class ScriptClassTest < Test::Unit::TestCase
     carry_out do |tmp|
       Proxy::OpenSCAP::ScapValidation.new.validate("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, 'scap_content')
       res = read_json tmp
-      assert res['errors'].empty?
+      assert_empty res['errors']
     end
   end
 
@@ -74,7 +74,7 @@ class ScriptClassTest < Test::Unit::TestCase
     carry_out do |tmp|
       Proxy::OpenSCAP::ScapValidation.new.validate("#{Dir.getwd}/test/data/tailoring.xml", tmp.path, 'tailoring_file')
       res = read_json tmp
-      assert res['errors'].empty?
+      assert_empty res['errors']
     end
   end
 
@@ -91,6 +91,7 @@ class ScriptClassTest < Test::Unit::TestCase
   end
 
   def read_json(file)
+    file.flush
     JSON.parse(File.read file)
   end
 end

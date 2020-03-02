@@ -18,10 +18,19 @@ class ScapContentParserApiTest < Test::Unit::TestCase
 
   def test_scap_content_policies
     post '/scap_content/policies', @scap_content, 'CONTENT_TYPE' => 'text/xml'
-    expected_response = {"xccdf_org.ssgproject.content_profile_test" => "test",
-                         "xccdf_org.ssgproject.content_profile_rht-ccp" => "Red Hat Corporate Profile for Certified Cloud Providers (RH CCP)",
-                         "xccdf_org.ssgproject.content_profile_common" => "Common Profile for General-Purpose Systems",
-                         "xccdf_org.ssgproject.content_profile_stig-rhel7-server-upstream" => "Common Profile for General-Purpose SystemsPre-release Draft STIG for RHEL 7 Server"}
+    expected_response = {
+      "xccdf_org.ssgproject.content_profile_stig-rhel7-disa"=>"DISA STIG for Red Hat Enterprise Linux 7",
+      "xccdf_org.ssgproject.content_profile_ospp"=>"United States Government Configuration Baseline",
+      "xccdf_org.ssgproject.content_profile_pci-dss"=>"PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 7",
+      "xccdf_org.ssgproject.content_profile_rht-ccp"=>"Red Hat Corporate Profile for Certified Cloud Providers (RH CCP)",
+      "xccdf_org.ssgproject.content_profile_C2S"=>"C2S for Red Hat Enterprise Linux 7",
+      "xccdf_org.ssgproject.content_profile_ospp42"=>"OSPP - Protection Profile for General Purpose Operating Systems v. 4.2",
+      "xccdf_org.ssgproject.content_profile_cjis"=>"Criminal Justice Information Services (CJIS) Security Policy",
+      "xccdf_org.ssgproject.content_profile_standard"=>"Standard System Security Profile for Red Hat Enterprise Linux 7",
+      "xccdf_org.ssgproject.content_profile_rhelh-vpp"=>"VPP - Protection Profile for Virtualization v. 1.0 for Red Hat Enterprise Linux Hypervisor (RHELH)",
+      "xccdf_org.ssgproject.content_profile_hipaa"=>"Health Insurance Portability and Accountability Act (HIPAA)",
+      "xccdf_org.ssgproject.content_profile_nist-800-171-cui"=>"Unclassified Information in Non-federal Information Systems and Organizations (NIST 800-171)"
+    }
     assert_equal(expected_response.to_json, last_response.body)
     assert(last_response.successful?)
   end
