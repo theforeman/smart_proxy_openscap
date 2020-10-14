@@ -1,31 +1,30 @@
-require 'smart_proxy_openscap/shell_wrapper'
+require 'openscap_parser/datastream_file'
+require 'openscap_parser/tailoring_file'
 
 module Proxy
   module OpenSCAP
-    class ProfilesParser < ShellWrapper
-      def initialize(type)
-        @type = type
-        @script_name = 'smart-proxy-scap-profiles'
-      end
+    class ProfilesParser
+      def profiles(file_type, scap_file)
+        profiles = []
+        error_msg = 'Failed to parse profiles'
+        begin
+          case file_type
+          when 'scap_content'
+            profiles = ::OpenscapParser::DatastreamFile.new(scap_file).benchmark.profiles
+          when 'tailoring_file'
+            profiles = ::OpenscapParser::TailoringFile.new(scap_file).tailoring.profiles
+          else
+            raise OpenSCAPException, "Unknown file type, expected 'scap_content' or 'tailoring_file'"
+          end
+        rescue Nokogiri::XML::SyntaxError
+          raise OpenSCAPException, error_msg
+        end
 
-      def profiles(scap_file)
-        execute_shell_command scap_file
-      end
+        raise OpenSCAPException, error_msg if profiles.empty?
 
-      def out_filename
-        "#{in_filename}json-"
-      end
-
-      def in_filename
-        "#{super}-#{@type}-profiles-"
-      end
-
-      def failure_message
-        "Failure when running script which extracts profiles from scap file"
-      end
-
-      def command(in_file, out_file)
-        "#{script_location} #{in_file.path} #{out_file.path} #{@type}"
+        result = profiles.reduce({}) do |memo, profile|
+          memo.tap { |acc| acc[profile.id] = profile.title }
+        end.to_json
       end
     end
   end

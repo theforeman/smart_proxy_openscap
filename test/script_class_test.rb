@@ -2,7 +2,6 @@ require 'test_helper'
 require 'smart_proxy_openscap/arf_html'
 require 'smart_proxy_openscap/arf_json'
 require 'smart_proxy_openscap/policy_guide'
-require 'smart_proxy_openscap/scap_profiles'
 require 'smart_proxy_openscap/arf_json'
 require 'smart_proxy_openscap/scap_validation'
 
@@ -32,24 +31,6 @@ class ScriptClassTest < Test::Unit::TestCase
       Proxy::OpenSCAP::PolicyGuide.new.generate_guide("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, profile)
       guide = read_json tmp
       assert guide['html'].start_with?('<!DOCTYPE'), "File should be html"
-    end
-  end
-
-  def test_scap_file_profiles
-    carry_out do |tmp|
-      Proxy::OpenSCAP::ScapProfiles.new.profiles("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, 'scap_content')
-      profiles = read_json tmp
-      refute_empty profiles
-      assert profiles["xccdf_org.ssgproject.content_profile_standard"]
-    end
-  end
-
-  def test_tailoring_file_profiles
-    carry_out do |tmp|
-      Proxy::OpenSCAP::ScapProfiles.new.profiles("#{Dir.getwd}/test/data/tailoring.xml", tmp.path, 'tailoring_file')
-      profiles = read_json tmp
-      refute_empty profiles
-      assert profiles["xccdf_org.ssgproject.content_profile_stig-firefox-upstream_customized"]
     end
   end
 
