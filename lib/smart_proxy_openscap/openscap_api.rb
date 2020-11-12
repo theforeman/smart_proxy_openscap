@@ -176,7 +176,7 @@ module Proxy::OpenSCAP
 
     def validate_scap_file(params)
       begin
-        Proxy::OpenSCAP::ContentParser.new(params[:type]).validate(request.body.string)
+        Proxy::OpenSCAP::ContentParser.new.validate(params[:type], request.body.string).to_json
       rescue *HTTP_ERRORS => e
         log_halt 500, e.message
       rescue StandardError => e

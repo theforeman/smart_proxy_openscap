@@ -3,7 +3,6 @@ require 'smart_proxy_openscap/arf_html'
 require 'smart_proxy_openscap/arf_json'
 require 'smart_proxy_openscap/policy_guide'
 require 'smart_proxy_openscap/arf_json'
-require 'smart_proxy_openscap/scap_validation'
 
 class ScriptClassTest < Test::Unit::TestCase
   def test_arf_generate_html
@@ -40,22 +39,6 @@ class ScriptClassTest < Test::Unit::TestCase
       json = read_json tmp
       refute_empty json['logs']
       refute_empty json['metrics']
-    end
-  end
-
-  def test_scap_content_validation
-    carry_out do |tmp|
-      Proxy::OpenSCAP::ScapValidation.new.validate("#{Dir.getwd}/test/data/ssg-rhel7-ds.xml", tmp.path, 'scap_content')
-      res = read_json tmp
-      assert_empty res['errors']
-    end
-  end
-
-  def test_tailoring_file_validation
-    carry_out do |tmp|
-      Proxy::OpenSCAP::ScapValidation.new.validate("#{Dir.getwd}/test/data/tailoring.xml", tmp.path, 'tailoring_file')
-      res = read_json tmp
-      assert_empty res['errors']
     end
   end
 
