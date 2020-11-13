@@ -31,3 +31,6 @@
 # Affects sending reports to Foreman (directly and from spool) and fetching scap content or tailoring file
 # for distribution to clients
 #:timeout: 60
+
+# Directory where OpenSCAP OVAL content bzipped XML are stored
+#:oval_content_dir: /var/lib/openscap/oval_content

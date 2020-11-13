@@ -145,6 +145,18 @@ module Proxy::OpenSCAP
       end
     end
 
+    get "/oval_policies/:oval_policy_id/oval_content/:digest" do
+      content_type 'application/x-bzip2'
+      begin
+        Proxy::OpenSCAP::FetchScapFile.new(:oval_content)
+          .fetch(params[:oval_policy_id], params[:digest], Proxy::OpenSCAP::Plugin.settings.oval_content_dir)
+      rescue *HTTP => e
+        log_halt e.response.code.to_i, file_not_found_msg
+      rescue StandardError => e
+        log_halt 500, "Error occurred: #{e.message}"
+      end
+    end
+
     post "/scap_content/policies" do
       begin
         Proxy::OpenSCAP::ProfilesParser.new.profiles('scap_content', request.body.string)
