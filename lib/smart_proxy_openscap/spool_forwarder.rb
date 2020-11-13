@@ -53,12 +53,12 @@ module Proxy::OpenSCAP
     def forward_arf_file(cname, policy_id, date, arf_file_path)
       data = File.open(arf_file_path, 'rb') { |io| io.read }
       post_to_foreman = ForemanForwarder.new.post_arf_report(cname, policy_id, date, data, @loaded_settings.timeout)
-      Proxy::OpenSCAP::StorageFS.new(@loaded_settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
+      Proxy::OpenSCAP::StorageFs.new(@loaded_settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
       File.delete arf_file_path
     rescue Nokogiri::XML::SyntaxError, Proxy::OpenSCAP::ReportDecompressError => e
       logger.error "Failed to parse Arf Report at #{arf_file_path}, moving to #{@loaded_settings.corrupted_dir}"
 
-      Proxy::OpenSCAP::StorageFS.new(@loaded_settings.corrupted_dir, cname, policy_id, date).
+      Proxy::OpenSCAP::StorageFs.new(@loaded_settings.corrupted_dir, cname, policy_id, date).
         move_corrupted(arf_file_path.split('/').last, @loaded_settings.spooldir)
     rescue Proxy::OpenSCAP::ReportUploadError => e
       logger.error "Failed to upload Arf Report at #{arf_file_path}, cause: #{e.message}, the report will be deleted."

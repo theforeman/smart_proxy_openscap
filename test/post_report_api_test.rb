@@ -58,7 +58,7 @@ class OpenSCAPApiTest < Test::Unit::TestCase
   def test_fail_save_file_should_raise_error
     @policy_id = 2
     stub_request(:post, "#{@foreman_url}/api/v2/compliance/arf_reports/#{@cname}/#{@policy_id}/#{@date}").to_return(:status => 500, :body => "{\"result\":\"server error\"}")
-    Proxy::OpenSCAP::StorageFS.any_instance.stubs(:create_directory).raises(StandardError)
+    Proxy::OpenSCAP::StorageFs.any_instance.stubs(:create_directory).raises(StandardError)
     post "/arf/#{@policy_id}", @arf_report, 'CONTENT_TYPE' => 'text/xml', 'CONTENT_ENCODING' => 'x-bzip2'
     assert(last_response.server_error?, "Should return 500")
     refute(File.file?("#{@results_path}/spool/arf/#{@cname}/#{@policy_id}/#{@date}/#{@filename}"), "File should be saved in spool directory")
@@ -67,7 +67,7 @@ class OpenSCAPApiTest < Test::Unit::TestCase
   def test_success_post_fail_save_should_save_spool
     stub_request(:post, "#{@foreman_url}/api/v2/compliance/arf_reports/#{@cname}/#{@policy_id}/#{@date}")
       .to_return(:status => 200, :body => "{\"result\":\"OK\",\"id\":\"#{@arf_id}\"}")
-    Proxy::OpenSCAP::StorageFS.any_instance.stubs(:store_archive).raises(Proxy::OpenSCAP::StoreReportError)
+    Proxy::OpenSCAP::StorageFs.any_instance.stubs(:store_archive).raises(Proxy::OpenSCAP::StoreReportError)
     post "/arf/#{@policy_id}", @arf_report, 'CONTENT_TYPE' => 'text/xml', 'CONTENT_ENCODING' => 'x-bzip2'
     refute(File.file?("#{@results_path}/spool/arf/#{@cname}/#{@policy_id}/#{@date}/#{@filename}"), "File should not be  in spool directory")
     refute(File.file?("#{@results_path}/reports/arf/#{@cname}/#{@arf_id}/#{@date}/#{@filename}"), "File should not be in Reports directory")
