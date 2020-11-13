@@ -1,8 +1,11 @@
 require 'pathname'
 require 'smart_proxy_openscap/storage'
+require 'smart_proxy_openscap/storage_fs_common'
 
 module Proxy::OpenSCAP
-  class StorageFS < Storage
+  class StorageFs < Storage
+    include StorageFsCommon
+
     def store_archive(data)
       store(data, StoreReportError)
     end
@@ -57,9 +60,9 @@ module Proxy::OpenSCAP
 
     private
 
-    def store_arf(spool_arf_dir, data)
+    def store_file(path_to_store, data)
       filename = Digest::SHA256.hexdigest data
-      target_path = spool_arf_dir + filename
+      target_path = path_to_store + filename
       File.open(target_path,'w') { |f| f.write(data) }
       target_path
     end
@@ -91,7 +94,7 @@ module Proxy::OpenSCAP
       end
 
       begin
-        target_path = store_arf(@path, data)
+        target_path = store_file(@path, data)
       rescue StandardError => e
         raise error_type, "Could not store file: #{e.message}"
       end

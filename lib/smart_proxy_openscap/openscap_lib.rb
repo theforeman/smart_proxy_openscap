@@ -26,6 +26,8 @@ require 'smart_proxy_openscap/openscap_html_generator'
 require 'smart_proxy_openscap/fetch_tailoring_file'
 require 'smart_proxy_openscap/policy_parser'
 require 'smart_proxy_openscap/profiles_parser'
+require 'smart_proxy_openscap/oval_report_storage_fs'
+require 'smart_proxy_openscap/oval_report_parser'
 
 module Proxy::OpenSCAP
   extend ::Proxy::Log

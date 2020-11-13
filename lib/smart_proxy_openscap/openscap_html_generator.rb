@@ -30,7 +30,7 @@ module Proxy
 
       def file_path_in_storage
         path_to_dir = Proxy::OpenSCAP::Plugin.settings.reportsdir
-        storage = Proxy::OpenSCAP::StorageFS.new(path_to_dir, @cname, @id, @date)
+        storage = Proxy::OpenSCAP::StorageFs.new(path_to_dir, @cname, @id, @date)
         storage.get_path(@digest)
       end
     end

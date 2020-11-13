@@ -2,8 +2,6 @@ require 'smart_proxy_openscap/openscap_exception'
 
 module Proxy::OpenSCAP
   class Storage
-    include ::Proxy::Log
-
     def initialize(path_to_dir, cname, id, date)
       @namespace = 'arf'
       @cname = cname
