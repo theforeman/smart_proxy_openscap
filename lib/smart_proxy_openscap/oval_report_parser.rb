@@ -5,7 +5,37 @@ module Proxy::OpenSCAP
   class OvalReportParser
     include Proxy::Log
 
-    def as_json(report_data)
+    def parse_cves(report_data)
+      report = oval_report report_data
+      results = report.definition_results.reduce({}) do |memo, result|
+        memo.tap { |acc| acc[result.definition_id] = parse_cve_res result }
+      end
+
+      report.definitions.map do |definition|
+        results[definition.id].merge(parse_cve_def definition)
+      end
+    end
+
+    private
+
+    def parse_cve_def(definition)
+      refs = definition.references.reduce([]) do |memo, ref|
+        memo.tap { |acc| acc << { :ref_id => ref.ref_id, :ref_url => ref.ref_url } if ref.source == 'CVE' }
+      end
+
+      { :references => refs }
+    end
+
+    def parse_cve_res(result)
+      { :result => result.result }
+    end
+
+    def oval_report(report_data)
+      decompressed = decompress report_data
+      ::OpenscapParser::OvalReport.new(decompressed)
+    end
+
+    def decompress(report_data)
       begin
         file = Tempfile.new
         file.write report_data
@@ -18,21 +48,7 @@ module Proxy::OpenSCAP
         file.close
         file.unlink
       end
-      parse_report(decompressed).to_json
-    end
-
-    private
-
-    def parse_report(decompressed)
-      report = ::OpenscapParser::OvalReport.new(decompressed)
-
-      results = report.definition_results.reduce({}) do |memo, result|
-        memo.tap { |acc| acc[result.definition_id] = result.to_h }
-      end
-
-      report.definitions.map do |definition|
-        results[definition.id].merge(definition.to_h)
-      end
+      decompressed
     end
   end
 end

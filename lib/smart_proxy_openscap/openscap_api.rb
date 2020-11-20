@@ -33,7 +33,7 @@ module Proxy::OpenSCAP
       do_authorize_with_trusted_hosts
     end
 
-    before '(/arf/*|/oval_report/*)' do
+    before '(/arf/*|/oval_reports/*)' do
       begin
         @cn = Proxy::OpenSCAP::common_name request
       rescue Proxy::Error::Unauthorized => e
@@ -46,7 +46,7 @@ module Proxy::OpenSCAP
       policy = params[:policy]
 
       begin
-        post_to_foreman = ForemanForwarder.new.post_arf_report(@cn, policy, @reported_at, request.body.string, Proxy::OpenSCAP::Plugin.settings.timeout)
+        post_to_foreman = ForemanArfForwarder.new.post_report(@cn, policy, @reported_at, request.body.string, Proxy::OpenSCAP::Plugin.settings.timeout)
         Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, @cn, post_to_foreman['id'], @reported_at).store_archive(request.body.string)
         post_to_foreman.to_json
       rescue Proxy::OpenSCAP::StoreReportError => e
@@ -57,7 +57,7 @@ module Proxy::OpenSCAP
       rescue Nokogiri::XML::SyntaxError => e
         error = "Failed to parse Arf Report, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
         logger.error error
-        Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, cn, policy, @reported_at).store_corrupted(request.body.string)
+        Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, @cn, policy, @reported_at).store_corrupted(request.body.string)
         { :result => (error << ' on proxy') }.to_json
       rescue *HTTP_ERRORS => e
         ### If the upload to foreman fails then store it in the spooldir
@@ -72,20 +72,14 @@ module Proxy::OpenSCAP
       end
     end
 
-    post "/oval_report/:oval_policy_id" do
-      json = OvalReportParser.new.as_json(request.body.string)
-
-      OvalReportStorageFs.new(
-        Proxy::OpenSCAP::Plugin.settings.reportsdir,
-        params[:oval_policy_id],
-        @cn,
-        @reported_at
-      ).store_report(json)
+    post "/oval_reports/:oval_policy_id" do
+      ForemanOvalForwarder.new.post_report(@cn, params[:oval_policy_id], @reported_at, request.body.string, Plugin.settings.timeout)
 
       { :reported_at => Time.at(@reported_at) }.to_json
-    rescue Proxy::OpenSCAP::StoreReportError => e
+    rescue *HTTP_ERRORS => e
+      msg = "Failed to upload to Foreman, failed with: #{e.message}"
       logger.error e
-      { :result => 'Storage failure on proxy, see proxy logs for details.' }.to_json
+      { :result => msg }.to_json
     rescue Nokogiri::XML::SyntaxError => e
       logger.error e
       { :result => 'Failed to parse OVAL report, see proxy logs for details' }.to_json
