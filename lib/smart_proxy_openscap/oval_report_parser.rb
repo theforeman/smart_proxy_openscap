@@ -20,10 +20,10 @@ module Proxy::OpenSCAP
 
     def parse_cve_def(definition)
       refs = definition.references.reduce([]) do |memo, ref|
-        memo.tap { |acc| acc << { :ref_id => ref.ref_id, :ref_url => ref.ref_url } if ref.source == 'CVE' }
+        memo.tap { |acc| acc << { :ref_id => ref.ref_id, :ref_url => ref.ref_url } }
       end
 
-      { :references => refs }
+      { :references => refs, :definition_id => definition.id }
     end
 
     def parse_cve_res(result)
