@@ -52,7 +52,7 @@ module Proxy::OpenSCAP
 
     def forward_arf_file(cname, policy_id, date, arf_file_path)
       data = File.open(arf_file_path, 'rb') { |io| io.read }
-      post_to_foreman = ForemanForwarder.new.post_arf_report(cname, policy_id, date, data, @loaded_settings.timeout)
+      post_to_foreman = ForemanArfForwarder.new.post_report(cname, policy_id, date, data, @loaded_settings.timeout)
       Proxy::OpenSCAP::StorageFs.new(@loaded_settings.reportsdir, cname, post_to_foreman['id'], date).store_archive(data)
       File.delete arf_file_path
     rescue Nokogiri::XML::SyntaxError, Proxy::OpenSCAP::ReportDecompressError => e

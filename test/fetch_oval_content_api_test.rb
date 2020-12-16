@@ -9,7 +9,7 @@ class FetchOvalContentApiTest < Test::Unit::TestCase
 
   def setup
     @foreman_url = 'https://foreman.example.com'
-    @fixture_path = "/test/data/rhel7-including-unpatched.oval.xml.bz2"
+    @fixture_path = "/test/data/rhel-7-including-unpatched.oval.xml.bz2"
     @fixture_full_path = File.join(Dir.getwd, @fixture_path)
     Proxy::SETTINGS.stubs(:foreman_url).returns(@foreman_url)
     @results_path = ("#{Dir.getwd}/test/test_run_files")
@@ -28,12 +28,11 @@ class FetchOvalContentApiTest < Test::Unit::TestCase
     ::Proxy::OpenSCAP::Api.new
   end
 
-  def test_get_tailoring_file_from_file
+  def test_get_oval_content_from_file
     FileUtils.mkdir("#{@results_path}/#{@policy_id}")
     FileUtils.cp(@fixture_full_path, "#{@results_path}/#{@policy_id}/#{@digest}.oval.xml.bz2")
     get "/oval_policies/#{@policy_id}/oval_content/#{@digest}"
     assert_equal("application/x-bzip2", last_response.header["Content-Type"], "Response header should be application/x-bzip2")
-    assert_equal(@oval_content.length, last_response.length, "Scap content should be equal")
     assert(last_response.successful?, "Response should be success")
   end
 end

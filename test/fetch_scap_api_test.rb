@@ -54,7 +54,7 @@ class FetchScapApiTest < Test::Unit::TestCase
   end
 
   def test_get_scap_content_permissions
-    Proxy::OpenSCAP::FetchScapContent.any_instance.stubs(:get_policy_content).raises(Errno::EACCES)
+    Proxy::OpenSCAP::FetchScapFile.any_instance.stubs(:fetch).raises(Errno::EACCES)
     stub_request(:get, "#{@foreman_url}/api/v2/compliance/policies/#{@policy_id}/content").to_return(:body => @scap_content)
     get "/policies/#{@policy_id}/content/#{@digest}"
     assert_equal(500, last_response.status, "No permissions should raise error 500")
