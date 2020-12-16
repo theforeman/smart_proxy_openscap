@@ -5,7 +5,7 @@ module Proxy::OpenSCAP
     private
 
     def parse_report(cname, policy_id, date, report_data)
-      Proxy::OpenSCAP::ArfParser.new(cname, policy_id, date).as_json(data)
+      Proxy::OpenSCAP::ArfParser.new(cname, policy_id, date).as_json(report_data)
     end
 
     def report_upload_path(cname, policy_id, date)
