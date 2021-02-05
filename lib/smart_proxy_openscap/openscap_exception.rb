@@ -6,4 +6,5 @@ module Proxy::OpenSCAP
   class FileNotFound < StandardError; end
   class StoreCorruptedError < StandardError; end
   class ReportUploadError < StandardError; end
+  class ReportDecompressError < StandardError; end
 end
