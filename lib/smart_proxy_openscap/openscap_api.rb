@@ -25,6 +25,13 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
     helpers ::Proxy::Helpers
     authorize_with_ssl_client
+    CLIENT_PATHS = Regexp.compile(%r{^(/arf/\d+|/policies/\d+/content/|/policies/\d+/tailoring/)})
+
+    # authorize via trusted hosts but let client paths in without such authorization
+    before do
+      pass if request.path_info =~ CLIENT_PATHS
+      do_authorize_with_trusted_hosts
+    end
 
     post "/arf/:policy" do
       # first let's verify client's certificate
