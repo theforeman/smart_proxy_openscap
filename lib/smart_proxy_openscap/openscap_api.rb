@@ -25,7 +25,7 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
     helpers ::Proxy::Helpers
     authorize_with_ssl_client
-    CLIENT_PATHS = Regexp.compile(%r{^(/arf/\d+|/policies/\d+/content/|/policies/\d+/tailoring/)})
+    CLIENT_PATHS = Regexp.compile(%r{^(/arf/\d+|/policies/\d+/content/|/policies/\d+/tailoring/|/oval_reports|/oval_policies)})
 
     # authorize via trusted hosts but let client paths in without such authorization
     before do
