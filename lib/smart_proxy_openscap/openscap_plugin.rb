@@ -18,11 +18,13 @@ module Proxy::OpenSCAP
     https_rackup_path File.expand_path("http_config.ru", File.expand_path("../", __FILE__))
 
     default_settings :spooldir => '/var/spool/foreman-proxy/openscap',
-                     :openscap_send_log_file => File.join(APP_ROOT, 'logs/openscap-send.log'),
-                     :contentdir => File.join(APP_ROOT, 'openscap/content'),
-                     :reportsdir => File.join(APP_ROOT, 'openscap/reports'),
-                     :failed_dir => File.join(APP_ROOT, 'openscap/failed'),
-                     :tailoring_dir => File.join(APP_ROOT, 'openscap/tailoring'),
-                     :oval_content_dir => File.join(APP_ROOT, 'openscap/oval_content')
+                     :openscap_send_log_file => '/var/log/foreman-proxy/openscap-send.log',
+                     :contentdir => '/var/lib/openscap/content',
+                     :reportsdir => '/usr/share/foreman-proxy/openscap/reports',
+                     :failed_dir => '/usr/share/foreman-proxy/openscap/failed',
+                     :tailoring_dir => '/usr/share/foreman-proxy/openscap/failed',
+                     :corrupted_dir => '/var/lib/foreman-proxy/openscap/corrupted',
+                     :oval_content_dir => '/var/lib/openscap/oval_content',
+                     :timeout => 60
   end
 end
