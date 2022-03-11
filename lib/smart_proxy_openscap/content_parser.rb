@@ -3,8 +3,10 @@ require 'openscap_parser/tailoring_file'
 
 module Proxy::OpenSCAP
   class ContentParser
+    include ::Proxy::Log
+
     def validate(file_type, scap_file)
-      msg = 'Invalid SCAP file type'
+      msg = 'Invalid XML format'
       errors = []
       file = nil
       begin
@@ -14,8 +16,9 @@ module Proxy::OpenSCAP
         when 'tailoring_file'
           file = ::OpenscapParser::TailoringFile.new(scap_file)
         end
-        errors << msg unless file.valid?
       rescue Nokogiri::XML::SyntaxError => e
+        logger.error msg
+        logger.error e.backtrace.join("\n")
         errors << msg
       end
       { errors: errors }
