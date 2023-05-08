@@ -1,7 +1,61 @@
-#!/bin/bash
+#!/usr/bin/env ruby
+#
+# Copyright (c) 2014--2015 Red Hat Inc.
+#
+# This software is licensed to you under the GNU General Public License,
+# version 3 (GPLv3). There is NO WARRANTY for this software, express or
+# implied, including the implied warranties of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv3
+# along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
+#
 
-if command -v scl &>/dev/null;then
-  scl enable tfm smart-proxy-openscap-send-inner
-else
-  smart-proxy-openscap-send-inner
-fi
+$LOAD_PATH.unshift '/usr/share/foreman-proxy/lib'
+$LOAD_PATH.unshift '/usr/share/foreman-proxy/modules'
+
+require 'smart_proxy'
+require 'smart_proxy_main'
+require 'smart_proxy_openscap'
+require 'smart_proxy_openscap/openscap_lib'
+
+loaded_settings = Proxy::OpenSCAP.plugin_settings
+
+# Don't run if OpenSCAP plugin is disabled or settings are missing.
+if !loaded_settings.enabled || loaded_settings.nil? || loaded_settings.empty?
+  exit 436
+end
+
+module Proxy
+  module Log
+    @@logger = ::Logger.new(Proxy::OpenSCAP.fullpath(Proxy::OpenSCAP.plugin_settings.openscap_send_log_file), 6, 1024*1024*10)
+    @@logger.level = ::Logger.const_get(Proxy::SETTINGS.log_level.upcase)
+  end
+end
+include Proxy::Log
+
+if !Proxy::SETTINGS.foreman_url
+  logger.error "Foreman URL not configured"
+  exit 437
+end
+
+lockfile = File.join(loaded_settings.spooldir, "spool.lock")
+
+Signal.trap("TERM") {
+  FileUtils.rm(lockfile) if File.exist?(lockfile)
+  exit
+}
+
+if File.exist? lockfile
+  logger.debug "Lock file #{lockfile} for openscap spool exists, not sending spool to server"
+  exit
+end
+
+begin
+  FileUtils.touch lockfile
+  Proxy::OpenSCAP::send_spool_to_foreman(loaded_settings)
+rescue StandardError => e
+  logger.error e
+  puts "#{e} See #{Proxy::OpenSCAP.fullpath(loaded_settings.openscap_send_log_file)}"
+  exit 438
+ensure
+  FileUtils.rm lockfile
+end
