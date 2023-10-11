@@ -87,7 +87,8 @@ module Proxy
           {
             :id => fix.id,
             :system => fix.system,
-            :full_text => fix.full_text(set_values)
+            :full_text => fix.full_text(set_values),
+            :reboot => fix.instance_variable_get('@parsed_xml')['reboot'] # TODO: add this to openscap_parser lib
           }
         end
       end
