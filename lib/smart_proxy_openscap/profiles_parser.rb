@@ -22,7 +22,7 @@ module Proxy
 
         raise OpenSCAPException, error_msg if profiles.empty?
 
-        result = profiles.reduce({}) do |memo, profile|
+        profiles.reduce({}) do |memo, profile|
           memo.tap { |acc| acc[profile.id] = profile.title }
         end.to_json
       end
