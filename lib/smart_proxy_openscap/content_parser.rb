@@ -8,13 +8,12 @@ module Proxy::OpenSCAP
     def validate(file_type, scap_file)
       msg = 'Invalid XML format'
       errors = []
-      file = nil
       begin
         case file_type
         when 'scap_content'
-          file = ::OpenscapParser::DatastreamFile.new(scap_file)
+          ::OpenscapParser::DatastreamFile.new(scap_file)
         when 'tailoring_file'
-          file = ::OpenscapParser::TailoringFile.new(scap_file)
+          ::OpenscapParser::TailoringFile.new(scap_file)
         end
       rescue Nokogiri::XML::SyntaxError => e
         logger.error msg
