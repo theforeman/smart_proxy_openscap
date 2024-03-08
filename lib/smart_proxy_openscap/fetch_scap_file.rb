@@ -24,8 +24,6 @@ module Proxy::OpenSCAP
         "api/v2/compliance/policies/:policy_id/content"
       when :tailoring_file
         "api/v2/compliance/policies/:policy_id/tailoring"
-      when :oval_content
-        "api/v2/compliance/oval_policies/:policy_id/oval_content"
       end
     end
 
@@ -33,13 +31,11 @@ module Proxy::OpenSCAP
       case @type
       when :scap_content, :tailoring_file
         "#{policy_id}_#{digest}.xml"
-      when :oval_content
-        "#{digest}.oval.xml.bz2"
       end
     end
 
     def allowed_types
-      [:scap_content, :tailoring_file, :oval_content]
+      [:scap_content, :tailoring_file]
     end
   end
 end
