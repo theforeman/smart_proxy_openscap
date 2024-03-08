@@ -25,7 +25,7 @@ module Proxy::OpenSCAP
     include ::Proxy::Log
     helpers ::Proxy::Helpers
     authorize_with_ssl_client
-    CLIENT_PATHS = Regexp.compile(%r{^(/arf/\d+|/policies/\d+/content/|/policies/\d+/tailoring/|/oval_reports|/oval_policies)})
+    CLIENT_PATHS = Regexp.compile(%r{^(/arf/\d+|/policies/\d+/content/|/policies/\d+/tailoring/)})
 
     # authorize via trusted hosts but let client paths in without such authorization
     before do
@@ -33,7 +33,7 @@ module Proxy::OpenSCAP
       do_authorize_with_trusted_hosts
     end
 
-    before '(/arf/*|/oval_reports/*)' do
+    before '/arf/*' do
       begin
         @cn = Proxy::OpenSCAP::common_name request
       rescue Proxy::Error::Unauthorized => e
@@ -71,22 +71,6 @@ module Proxy::OpenSCAP
         { :result => e.message }.to_json
       end
     end
-
-    post "/oval_reports/:oval_policy_id" do
-      ForemanOvalForwarder.new.post_report(@cn, params[:oval_policy_id], @reported_at, request.body.string, Plugin.settings.timeout)
-
-      { :reported_at => Time.at(@reported_at) }.to_json
-    rescue *HTTP_ERRORS => e
-      msg = "Failed to upload to Foreman, failed with: #{e.message}"
-      logger.error e
-      { :result => msg }.to_json
-    rescue Nokogiri::XML::SyntaxError => e
-      logger.error e
-      { :result => 'Failed to parse OVAL report, see proxy logs for details' }.to_json
-    rescue Proxy::OpenSCAP::ReportUploadError, Proxy::OpenSCAP::ReportDecompressError => e
-      { :result => e.message }.to_json
-    end
-
 
     get "/arf/:id/:cname/:date/:digest/xml" do
       content_type 'application/x-bzip2'
@@ -133,18 +117,6 @@ module Proxy::OpenSCAP
         Proxy::OpenSCAP::FetchScapFile.new(:tailoring_file)
           .fetch(params[:policy_id], params[:digest], Proxy::OpenSCAP::Plugin.settings.tailoring_dir)
       rescue *HTTP_ERRORS => e
-        log_halt e.response.code.to_i, file_not_found_msg
-      rescue StandardError => e
-        log_halt 500, "Error occurred: #{e.message}"
-      end
-    end
-
-    get "/oval_policies/:oval_policy_id/oval_content/:digest" do
-      content_type 'application/x-bzip2'
-      begin
-        Proxy::OpenSCAP::FetchScapFile.new(:oval_content)
-          .fetch(params[:oval_policy_id], params[:digest], Proxy::OpenSCAP::Plugin.settings.oval_content_dir)
-      rescue *HTTP => e
         log_halt e.response.code.to_i, file_not_found_msg
       rescue StandardError => e
         log_halt 500, "Error occurred: #{e.message}"
