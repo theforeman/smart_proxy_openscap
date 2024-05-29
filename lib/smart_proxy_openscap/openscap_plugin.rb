@@ -22,7 +22,6 @@ module Proxy::OpenSCAP
                      :contentdir => File.join(APP_ROOT, 'openscap/content'),
                      :reportsdir => File.join(APP_ROOT, 'openscap/reports'),
                      :failed_dir => File.join(APP_ROOT, 'openscap/failed'),
-                     :tailoring_dir => File.join(APP_ROOT, 'openscap/tailoring'),
-                     :oval_content_dir => File.join(APP_ROOT, 'openscap/oval_content')
+                     :tailoring_dir => File.join(APP_ROOT, 'openscap/tailoring')
   end
 end
