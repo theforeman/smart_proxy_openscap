@@ -8,6 +8,7 @@
 # along with this software; if not, see http://www.gnu.org/licenses/gpl.txt
 #
 require 'smart_proxy_openscap/openscap_lib'
+require 'smart_proxy_openscap/helpers'
 
 module Proxy::OpenSCAP
   HTTP_ERRORS = [
@@ -24,6 +25,7 @@ module Proxy::OpenSCAP
   class Api < ::Sinatra::Base
     include ::Proxy::Log
     helpers ::Proxy::Helpers
+    helpers ::Proxy::OpenSCAP::Helpers
     authorize_with_ssl_client
     CLIENT_PATHS = Regexp.compile(%r{^(/arf/\d+|/policies/\d+/content/|/policies/\d+/tailoring/)})
 
@@ -44,32 +46,37 @@ module Proxy::OpenSCAP
 
     post "/arf/:policy" do
       policy = params[:policy]
-
-      begin
-        post_to_foreman = ForemanArfForwarder.new.post_report(@cn, policy, @reported_at, request.body.string, Proxy::OpenSCAP::Plugin.settings.timeout)
-        Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, @cn, post_to_foreman['id'], @reported_at).store_archive(request.body.string)
-        post_to_foreman.to_json
-      rescue Proxy::OpenSCAP::StoreReportError => e
-        Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.failed_dir, @cn, post_to_foreman['id'], @reported_at).store_failed(request.body.string)
-        logger.error "Failed to save Report in reports directory (#{Proxy::OpenSCAP::Plugin.settings.reportsdir}). Failed with: #{e.message}.
-                      Saving file in #{Proxy::OpenSCAP::Plugin.settings.failed_dir}. Please copy manually to #{Proxy::OpenSCAP::Plugin.settings.reportsdir}"
-        { :result => 'Storage failure on proxy, see proxy logs for details' }.to_json
-      rescue Nokogiri::XML::SyntaxError => e
-        error = "Failed to parse Arf Report, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
-        logger.error error
-        Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, @cn, policy, @reported_at).store_corrupted(request.body.string)
-        { :result => (error << ' on proxy') }.to_json
-      rescue *HTTP_ERRORS => e
-        ### If the upload to foreman fails then store it in the spooldir
-        msg = "Failed to upload to Foreman, saving in spool. Failed with: #{e.message}"
-        logger.error msg
-        Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.spooldir, @cn, policy, @reported_at).store_spool(request.body.string)
-        { :result => msg }.to_json
-      rescue Proxy::OpenSCAP::StoreSpoolError => e
-        log_halt 500, e.message
-      rescue Proxy::OpenSCAP::ReportUploadError, Proxy::OpenSCAP::ReportDecompressError => e
-        { :result => e.message }.to_json
+      response = forked_response do
+        begin
+          post_to_foreman = ForemanArfForwarder.new.post_report(@cn, policy, @reported_at, request.body.string, Proxy::OpenSCAP::Plugin.settings.timeout)
+          Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, @cn, post_to_foreman['id'], @reported_at).store_archive(request.body.string)
+          post_to_foreman.to_json
+        rescue Proxy::OpenSCAP::StoreReportError => e
+          Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.failed_dir, @cn, post_to_foreman['id'], @reported_at).store_failed(request.body.string)
+          logger.error "Failed to save Report in reports directory (#{Proxy::OpenSCAP::Plugin.settings.reportsdir}). Failed with: #{e.message}.
+                        Saving file in #{Proxy::OpenSCAP::Plugin.settings.failed_dir}. Please copy manually to #{Proxy::OpenSCAP::Plugin.settings.reportsdir}"
+          { :result => 'Storage failure on proxy, see proxy logs for details' }.to_json
+        rescue Nokogiri::XML::SyntaxError => e
+          error = "Failed to parse Arf Report, moving to #{Proxy::OpenSCAP::Plugin.settings.corrupted_dir}"
+          logger.error error
+          Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.corrupted_dir, @cn, policy, @reported_at).store_corrupted(request.body.string)
+          { :result => (error << ' on proxy') }.to_json
+        rescue *HTTP_ERRORS => e
+          ### If the upload to foreman fails then store it in the spooldir
+          msg = "Failed to upload to Foreman, saving in spool. Failed with: #{e.message}"
+          logger.error msg
+          Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.spooldir, @cn, policy, @reported_at).store_spool(request.body.string)
+          { :result => msg }.to_json
+        rescue Proxy::OpenSCAP::StoreSpoolError => e
+          [e.message, 500]
+        rescue Proxy::OpenSCAP::ReportUploadError, Proxy::OpenSCAP::ReportDecompressError => e
+          { :result => e.message }.to_json
+        end
       end
+      if code = response['code']
+        log_halt code, response['body']
+      end
+      response['body']
     end
 
     get "/arf/:id/:cname/:date/:digest/xml" do
