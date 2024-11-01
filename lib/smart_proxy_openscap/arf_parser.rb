@@ -17,7 +17,7 @@ module Proxy
           file = Tempfile.new
           file.write(arf_data)
           file.rewind
-          decompressed = `bunzip2 -dc #{file.path}`
+          decompressed = Proxy::OpenSCAP.execute('bunzip2', '-dc', file.path).first
         rescue => e
           logger.error e
           raise Proxy::OpenSCAP::ReportDecompressError, "Failed to decompress received report bzip, cause: #{e.message}"

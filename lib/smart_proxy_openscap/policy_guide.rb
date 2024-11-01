@@ -9,7 +9,8 @@ module Proxy
         file = Tempfile.new
         file.write file_content
         file.rewind
-        `oscap xccdf generate #{profile_opt policy_id} guide #{file.path}`
+        command = ['oscap', 'xccdf', 'generate'] + profile_opt(policy_id) + ['guide', file.path]
+        Proxy::OpenSCAP.execute(*command).first
       rescue => e
         logger.debug e.message
         logger.debug e.backtrace.join("\n\t")
@@ -20,7 +21,7 @@ module Proxy
       end
 
       def profile_opt(policy_id)
-        policy_id ? "--profile #{policy_id}" : ''
+        policy_id ? ['--profile', policy_id] : []
       end
     end
   end
