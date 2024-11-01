@@ -15,11 +15,14 @@ Gem::Specification.new do |s|
   s.files = `git ls-files`.split("\n") - ['.gitignore']
   s.executables = ['smart-proxy-openscap-send']
   s.requirements = 'bzip2'
+  s.requirements = 'oscap'
 
-  s.add_development_dependency('rake')
-  s.add_development_dependency('rack-test')
-  s.add_development_dependency('mocha')
-  s.add_development_dependency('webmock')
+  s.required_ruby_version = '>= 2.7', '< 4'
+
+  s.add_development_dependency('rake', '~> 13.0')
+  s.add_development_dependency('rack-test', '~> 0')
+  s.add_development_dependency('mocha', '~> 1')
+  s.add_development_dependency('webmock', '~> 3')
   s.add_dependency 'openscap', '~> 0.4.7'
   s.add_dependency 'openscap_parser', '~> 1.0.2'
 end
