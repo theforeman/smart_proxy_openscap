@@ -9,6 +9,8 @@
 #
 
 require 'smart_proxy_openscap/version'
+require 'smart_proxy_openscap/validate_settings'
+require 'smart_proxy_openscap/openscap_exception'
 
 module Proxy::OpenSCAP
   class Plugin < ::Proxy::Plugin
@@ -23,5 +25,8 @@ module Proxy::OpenSCAP
                      :reportsdir => File.join(APP_ROOT, 'openscap/reports'),
                      :failed_dir => File.join(APP_ROOT, 'openscap/failed'),
                      :tailoring_dir => File.join(APP_ROOT, 'openscap/tailoring')
+
+    load_validators :validate_settings => ::Proxy::OpenSCAP::ValidateSettings
+    validate :validate!, :validate_settings => nil
   end
 end
