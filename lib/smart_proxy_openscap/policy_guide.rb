@@ -6,18 +6,16 @@ module Proxy
       include ::Proxy::Log
 
       def generate_guide(file_content, policy_id)
-        file = Tempfile.new
-        file.write file_content
-        file.rewind
-        command = ['oscap', 'xccdf', 'generate'] + profile_opt(policy_id) + ['guide', file.path]
-        Proxy::OpenSCAP.execute(*command).first
+        Tempfile.create do |file|
+          file.write file_content
+          file.flush
+          command = ['oscap', 'xccdf', 'generate'] + profile_opt(policy_id) + ['guide', file.path]
+          Proxy::OpenSCAP.execute(*command).first
+        end
       rescue => e
         logger.debug e.message
         logger.debug e.backtrace.join("\n\t")
         raise OpenSCAPException, "Failed to generate policy guide, cause: #{e.message}"
-      ensure
-        file.close
-        file.unlink
       end
 
       def profile_opt(policy_id)
