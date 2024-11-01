@@ -7,12 +7,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  rubocop:
-    name: Rubocop
-    uses: theforeman/actions/.github/workflows/rubocop.yml@v0
-
   test:
     name: Tests
     uses: theforeman/actions/.github/workflows/test-gem.yml@v0
     with:
       command: bundle exec rake test
+      extra_packages: libopenscap8
