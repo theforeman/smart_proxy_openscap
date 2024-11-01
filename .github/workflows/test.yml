@@ -16,3 +16,4 @@ jobs:
     uses: theforeman/actions/.github/workflows/test-gem.yml@v0
     with:
       command: bundle exec rake test
+      extra_packages: openscap-scanner
