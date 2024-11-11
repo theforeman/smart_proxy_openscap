@@ -6,7 +6,6 @@ group :development do
   gem 'pry'
   gem 'pry-byebug'
   gem 'rubocop'
-  gem 'rack', '~> 1.6.8' if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.2')
   gem 'smart_proxy', :github => "theforeman/smart-proxy", :branch => 'develop'
 end
 
