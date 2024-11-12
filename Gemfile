@@ -6,7 +6,7 @@ group :development do
   gem 'pry'
   gem 'pry-byebug'
   gem 'rubocop'
-  gem 'smart_proxy', :github => "theforeman/smart-proxy", :branch => ENV['SMART_PROXY_BRANCH']
+  gem 'smart_proxy', :github => "theforeman/smart-proxy", :branch => ENV.fetch('SMART_PROXY_BRANCH', 'develop')
 end
 
 # load local gemfile
