@@ -65,7 +65,7 @@ module Proxy::OpenSCAP
     pathname.relative? ? pathname.expand_path(Sinatra::Base.root).to_s : path
   end
 
-  def self.execute(*cmd)
+  def self.execute!(*cmd)
     out, err, status = Open3.capture3(*cmd)
     raise "'#{cmd.join(' ')} exited with #{status.exitstatus}: #{err}" unless status.success?
     [out, err, status]

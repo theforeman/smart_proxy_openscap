@@ -12,7 +12,7 @@ module Proxy
       end
 
       def as_html(file_in_storage)
-        Proxy::OpenSCAP.execute('oscap', 'xccdf', 'generate', 'report', file_in_storage).first
+        Proxy::OpenSCAP.execute!('oscap', 'xccdf', 'generate', 'report', file_in_storage).first
       rescue => e
         logger.debug e.message
         logger.debug e.backtrace.join("\n\t")

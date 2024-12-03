@@ -10,7 +10,7 @@ module Proxy
           file.write file_content
           file.flush
           command = ['oscap', 'xccdf', 'generate'] + profile_opt(policy_id) + ['guide', file.path]
-          Proxy::OpenSCAP.execute(*command).first
+          Proxy::OpenSCAP.execute!(*command).first
         end
       rescue => e
         logger.debug e.message
