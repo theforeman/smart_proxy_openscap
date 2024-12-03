@@ -13,17 +13,13 @@ module Proxy
       end
 
       def as_json(arf_data)
-        begin
-          file = Tempfile.new
+        decompressed = Tempfile.create do |file|
           file.write(arf_data)
-          file.rewind
-          decompressed = `bunzip2 -dc #{file.path}`
+          file.flush
+          Proxy::OpenSCAP.execute!('bunzip2', '-dc', file.path).first
         rescue => e
           logger.error e
           raise Proxy::OpenSCAP::ReportDecompressError, "Failed to decompress received report bzip, cause: #{e.message}"
-        ensure
-          file.close
-          file.unlink
         end
         arf_file = ::OpenscapParser::TestResultFile.new(decompressed)
         rules = arf_file.benchmark.rules.reduce({}) do |memo, rule|

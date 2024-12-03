@@ -14,15 +14,16 @@ require 'pathname'
 require 'json'
 require 'proxy/error'
 require 'yaml'
+require 'open3'
 require 'ostruct'
 require 'proxy/request'
 require 'smart_proxy_openscap/foreman_arf_forwarder'
 require 'smart_proxy_openscap/content_parser'
 require 'smart_proxy_openscap/openscap_exception'
+require 'smart_proxy_openscap/arf_html'
 require 'smart_proxy_openscap/arf_parser'
 require 'smart_proxy_openscap/spool_forwarder'
-require 'smart_proxy_openscap/openscap_html_generator'
-require 'smart_proxy_openscap/policy_parser'
+require 'smart_proxy_openscap/policy_guide'
 require 'smart_proxy_openscap/profiles_parser'
 require 'smart_proxy_openscap/fetch_scap_file'
 
@@ -62,5 +63,11 @@ module Proxy::OpenSCAP
   def self.fullpath(path = Proxy::OpenSCAP::Plugin.settings.contentdir)
     pathname = Pathname.new(path)
     pathname.relative? ? pathname.expand_path(Sinatra::Base.root).to_s : path
+  end
+
+  def self.execute!(*cmd)
+    out, err, status = Open3.capture3(*cmd)
+    raise "'#{cmd.join(' ')} exited with #{status.exitstatus}: #{err}" unless status.success?
+    [out, err, status]
   end
 end

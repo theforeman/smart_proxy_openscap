@@ -1,22 +1,25 @@
-require 'openscap'
-require 'openscap/source'
-require 'openscap/ds/sds'
-require 'json'
+require 'smart_proxy_openscap/openscap_exception'
 
 module Proxy
   module OpenSCAP
     class PolicyGuide
-      def generate_guide(in_file, out_file, policy=nil)
-        ::OpenSCAP.oscap_init
-        source = ::OpenSCAP::Source.new in_file
-        sds = ::OpenSCAP::DS::Sds.new source
-        sds.select_checklist
-        html = sds.html_guide policy
-        File.write(out_file, { :html => html.force_encoding('UTF-8') }.to_json)
-      ensure
-        sds.destroy if sds
-        source.destroy if source
-        ::OpenSCAP.oscap_cleanup
+      include ::Proxy::Log
+
+      def generate_guide(file_content, policy_id)
+        Tempfile.create do |file|
+          file.write file_content
+          file.flush
+          command = ['oscap', 'xccdf', 'generate'] + profile_opt(policy_id) + ['guide', file.path]
+          Proxy::OpenSCAP.execute!(*command).first
+        end
+      rescue => e
+        logger.debug e.message
+        logger.debug e.backtrace.join("\n\t")
+        raise OpenSCAPException, "Failed to generate policy guide, cause: #{e.message}"
+      end
+
+      def profile_opt(policy_id)
+        policy_id ? ['--profile', policy_id] : []
       end
     end
   end
