@@ -22,10 +22,7 @@ module Proxy
           raise Proxy::OpenSCAP::ReportDecompressError, "Failed to decompress received report bzip, cause: #{e.message}"
         end
         arf_file = ::OpenscapParser::TestResultFile.new(decompressed)
-        rules = arf_file.benchmark.rules.reduce({}) do |memo, rule|
-          memo[rule.id] = rule
-          memo
-        end
+        rules = arf_file.benchmark.rules.to_h { |rule| [rule.id, rule] }
 
         arf_digest = Digest::SHA256.hexdigest(arf_data)
         report = parse_results(rules, arf_file.test_result, arf_digest)
@@ -37,18 +34,16 @@ module Proxy
       private
 
       def parse_results(rules, test_result, arf_digest)
-        results = test_result.rule_results
         set_values = test_result.set_values
-        report = {}
-        report[:logs] = []
         passed = 0
         failed = 0
         othered = 0
-        results.each do |result|
+
+        logs = test_result.rule_results.filter_map do |result|
           next if result.result == 'notapplicable' || result.result == 'notselected'
+
           # get rules and their results
           rule_data = rules[result.id]
-          report[:logs] << populate_result_data(result.id, result.result, rule_data, set_values)
           # create metrics for the results
           case result.result
             when 'pass', 'fixed'
@@ -58,24 +53,29 @@ module Proxy
             else
               othered += 1
           end
+
+          populate_result_data(result.id, result.result, rule_data, set_values)
         end
-        report[:digest]  = arf_digest
-        report[:metrics] = { :passed => passed, :failed => failed, :othered => othered }
-        report[:score] = test_result.score
-        report
+
+        {
+          logs: logs,
+          digest: arf_digest,
+          metrics: { :passed => passed, :failed => failed, :othered => othered },
+          score: test_result.score,
+        }
       end
 
       def populate_result_data(result_id, rule_result, rule_data, set_values)
-        log               = {}
-        log[:source]      = result_id
-        log[:result]      = rule_result
-        log[:title]       = rule_data.title
-        log[:description] = rule_data.description
-        log[:rationale]   = rule_data.rationale
-        log[:references]  = rule_data.references.map { |ref| { :href => ref.href, :title => ref.label }}
-        log[:fixes]       = populate_fixes rule_data.fixes, set_values
-        log[:severity]    = rule_data.severity
-        log
+        {
+          source: result_id,
+          result: rule_result,
+          title: rule_data.title,
+          description: rule_data.description,
+          rationale: rule_data.rationale,
+          references: rule_data.references.map { |ref| { :href => ref.href, :title => ref.label }},
+          fixes: populate_fixes(rule_data.fixes, set_values),
+          severity: rule_data.severity,
+        }
       end
 
       def populate_fixes(fixes, set_values)
