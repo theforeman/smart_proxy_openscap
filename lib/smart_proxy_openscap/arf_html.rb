@@ -7,7 +7,7 @@ module Proxy
       include ::Proxy::Log
 
       def generate(cname, id, date, digest)
-        file_path = file_path_in_storage cname, id, date, digest
+        file_path = file_path_in_storage(cname, id, date, digest)
         as_html file_path
       end
 
