@@ -27,6 +27,11 @@ module Proxy::OpenSCAP
       move "#{source}/#{digest}", StoreCorruptedError
     end
 
+    def move_from_spool(digest, spooldir)
+      path = Dir.glob("#{spooldir}/#{@namespace}/#{@cname}/*/#{@date}/#{digest}").first
+      move path, StoreSpoolError
+    end
+
     def get_arf_xml(digest)
       get_arf_file(digest)[:xml]
     end
@@ -45,8 +50,14 @@ module Proxy::OpenSCAP
 
     def get_path(digest)
       full_path = @path + digest
-      raise FileNotFound, "Can't find path #{full_path}" if !File.file?(full_path) || File.zero?(full_path)
+      if !File.file?(full_path) || File.zero?(full_path)
+        logger.info "File not found in storage, trying to get it from spool"
+        path_to_spool = Proxy::OpenSCAP::Plugin.settings.spooldir
+        move_from_spool(digest, path_to_spool)
+      end
       full_path
+    rescue StoreSpoolError
+      raise FileNotFound, "Can't find path #{full_path}"
     end
 
     def spool_errors
