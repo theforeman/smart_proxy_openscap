@@ -7,7 +7,7 @@ module Proxy
       include ::Proxy::Log
 
       def generate(cname, id, date, digest)
-        file_path = file_path_in_storage cname, id, date, digest
+        file_path = file_path_in_storage(cname, id, date, digest)
         as_html file_path
       end
 
@@ -22,6 +22,11 @@ module Proxy
       def file_path_in_storage(cname, id, date, digest)
         path_to_dir = Proxy::OpenSCAP::Plugin.settings.reportsdir
         storage = Proxy::OpenSCAP::StorageFs.new(path_to_dir, cname, id, date)
+        storage.get_path(digest)
+      rescue Proxy::OpenSCAP::FileNotFound
+        logger.info "File not found in storage, trying to get it from spool"
+        path_to_spool = Proxy::OpenSCAP::Plugin.settings.spooldir
+        storage.move_from_spool(digest, path_to_spool)
         storage.get_path(digest)
       end
     end

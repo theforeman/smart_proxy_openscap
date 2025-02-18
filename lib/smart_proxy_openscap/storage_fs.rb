@@ -27,6 +27,11 @@ module Proxy::OpenSCAP
       move "#{source}/#{digest}", StoreCorruptedError
     end
 
+    def move_from_spool(digest, spooldir)
+      path = Dir.glob("#{spooldir}/#{@namespace}/#{@cname}/*/#{@date}/#{digest}").first
+      move path, StoreSpoolError
+    end
+
     def get_arf_xml(digest)
       get_arf_file(digest)[:xml]
     end

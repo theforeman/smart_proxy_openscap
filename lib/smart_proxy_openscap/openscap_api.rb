@@ -82,9 +82,16 @@ module Proxy::OpenSCAP
     get "/arf/:id/:cname/:date/:digest/xml" do
       content_type 'application/x-bzip2'
       begin
-        Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date]).get_arf_xml(params[:digest])
-      rescue FileNotFound => e
-        log_halt 500, "Could not find requested file, #{e.message}"
+        storage = Proxy::OpenSCAP::StorageFs.new(Proxy::OpenSCAP::Plugin.settings.reportsdir, params[:cname], params[:id], params[:date])
+        digest = params[:digest]
+        storage.get_arf_xml(digest)
+      rescue FileNotFound
+        logger.info "File not found in storage, trying to get it from spool"
+        path_to_spool = Proxy::OpenSCAP::Plugin.settings.spooldir
+        storage.move_from_spool(digest, path_to_spool)
+        storage.get_arf_xml(digest)
+      rescue StoreSpoolError => e
+        log_halt 500, e.message
       end
     end
 
